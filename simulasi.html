@@ -132,19 +132,13 @@
                 </div>
 
                 <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1 ml-1">Merek & Tipe</label>
-                    <input type="text" id="vehicle-model" placeholder="Contoh: Toyota Avanza G" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-600 outline-none font-semibold">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1 ml-1">Merek & Tipe Kendaraan</label>
+                    <input type="text" id="vehicle-model" placeholder="Contoh: Honda Vario 150cc" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-600 outline-none font-semibold">
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1 ml-1">Tahun</label>
-                        <input type="number" id="vehicle-year" placeholder="2020" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-600 outline-none font-semibold">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1 ml-1">Plat Nomor</label>
-                        <input type="text" id="plate-number" placeholder="B 1234 XXX" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-600 outline-none font-semibold uppercase">
-                    </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1 ml-1">Tahun Kendaraan</label>
+                    <input type="number" id="vehicle-year" placeholder="Contoh: 2018" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-600 outline-none font-semibold">
                 </div>
 
                 <button onclick="submitToWhatsApp()" class="w-full bg-orange-600 text-white font-bold py-5 rounded-2xl shadow-lg hover:bg-orange-700 transition-all mt-4 flex items-center justify-center gap-2">
@@ -158,7 +152,7 @@
     <script>
         let selectedTenor = 12;
 
-        // FUNGSI UTAMA: Ambil Identitas Mitra (Prioritas LocalStorage)
+        // Fungsi ambil identitas dari pendaftaran (index.html)
         function getMitraIdentity() {
             const savedName = localStorage.getItem('mitra_name');
             const savedUsaha = localStorage.getItem('mitra_usaha');
@@ -218,6 +212,7 @@
         function calculateSimulation() {
             const amount = cleanNumber(document.getElementById('amount-input').value);
             const type = document.getElementById('main-vehicle-type').value;
+            // Bunga estimasi: Mobil 0.9%, Motor 1.5%
             const interestRate = (type === "Mobil") ? 0.009 : 0.015; 
             const totalPayment = amount + (amount * interestRate * selectedTenor);
             const monthly = selectedTenor > 0 ? Math.round(totalPayment / selectedTenor) : 0;
@@ -248,7 +243,6 @@
             const debitur = document.getElementById('debitur-name').value.trim();
             const model = document.getElementById('vehicle-model').value.trim();
             const year = document.getElementById('vehicle-year').value.trim();
-            const plate = document.getElementById('plate-number').value.trim();
             const type = document.getElementById('main-vehicle-type').value;
             const amountStr = document.getElementById('amount-input').value;
             const installmentStr = document.getElementById('monthly-installment').innerText;
@@ -258,15 +252,15 @@
                 return;
             }
 
-            const message = `Halo Admin Smart Finance,\n` +
-                            `Mohon bantu hitungkan simulasi resmi mitra berikut:\n\n` +
+            // Link Pesan WhatsApp dengan data terinput
+            const message = `Halo Smart Finance,\n` +
+                            `Mohon bantu hitungkan simulasi resmi berikut:\n\n` +
                             `*IDENTITAS MITRA*:\n` +
                             `• Nama: ${identity.nama}\n` +
                             `• Usaha: ${identity.usaha}\n\n` +
                             `*DATA NASABAH*:\n` +
                             `• Debitur: ${debitur}\n` +
                             `• Unit: ${type} ${model} ${year}\n` +
-                            `• Plat No: ${plate || '-'}\n` +
                             `• Plafon: Rp ${amountStr}\n` +
                             `• Tenor: ${selectedTenor} Bulan\n` +
                             `• Angsuran: ${installmentStr}\n\n` +
@@ -280,7 +274,7 @@
             lucide.createIcons();
             updateTenorOptions();
             
-            // SINKRONISASI IDENTITAS
+            // Tampilkan identitas mitra yang tersimpan
             const identity = getMitraIdentity();
             document.getElementById('mitra-name').value = identity.nama;
             
