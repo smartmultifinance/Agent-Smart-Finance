@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrasi Mitra Baru</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { color: var(--primary); text-align: center; margin-bottom: 20px; margin-top: 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #334155; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        input:focus { outline: 2px solid var(--primary); border-color: transparent; }
+        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: background 0.3s; }
+        button:hover { background: #1d4ed8; }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        #success-msg { display: none; text-align: center; }
+        .btn-simulasi { background: #10b981; text-decoration: none; display: block; text-align: center; color: white; padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 20px; transition: background 0.3s; }
+        .btn-simulasi:hover { background: #059669; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div id="form-container">
+        <h2>Daftar Mitra Baru</h2>
+        <form id="reg-form">
+            <div class="form-group">
+                <label>Nama Sesuai KTP</label>
+                <input type="text" name="nama" placeholder="Masukkan nama lengkap" required>
+            </div>
+            <div class="form-group">
+                <label>Nomor Kontak (HP/WA)</label>
+                <input type="tel" name="kontak" placeholder="08xxxxxxxxxx" required>
+            </div>
+            <div class="form-group">
+                <label>Upline (Nama MCS)</label>
+                <input type="text" name="upline" placeholder="Nama pengundang/upline" required>
+            </div>
+            <div class="form-group">
+                <label>Jenis Usaha (Optional)</label>
+                <input type="text" name="usaha" placeholder="Contoh: Toko, Bengkel, dll">
+            </div>
+            <button type="submit" id="btn-submit">Daftar Sekarang</button>
+        </form>
+    </div>
+
+    <div id="success-msg">
+        <div style="font-size: 50px; margin-bottom: 10px;">✅</div>
+        <h3 style="color: #10b981; margin-top: 0;">Registrasi Berhasil!</h3>
+        <p style="color: #64748b;">Data Anda telah tersimpan di sistem kami.</p>
+        <a href="simulasi.html" class="btn-simulasi">Buka Sistem Simulasi →</a>
+    </div>
+</div>
+
+<script>
+    // URL dari Deployment Google Apps Script kamu
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx3L-Cf8P7FzmMSYsw1J5_epDl7uFtIMttBK2z0lQ2oy3KkVtixzBgVAqcpEEVCzsjs/exec';
+    
+    const form = document.getElementById('reg-form');
+    const formContainer = document.getElementById('form-container');
+    const successMsg = document.getElementById('success-msg');
+    const btnSubmit = document.getElementById('btn-submit');
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        
+        // Ubah tombol jadi loading
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Sedang Menyimpan...";
+        
+        fetch(scriptURL, { 
+            method: 'POST', 
+            body: new FormData(form)
+        })
+        .then(response => {
+            console.log('Success!', response);
+            // Sembunyikan form, tampilkan pesan sukses
+            formContainer.style.display = 'none';
+            successMsg.style.display = 'block';
+        })
+        .catch(error => {
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "Daftar Sekarang";
+            alert('Waduh, koneksi bermasalah. Coba lagi ya!');
+            console.error('Error!', error.message);
+        });
+    });
+</script>
+
+</body>
+</html>
