@@ -6,22 +6,119 @@
     <title>Registrasi Mitra Baru</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --bg: #f8fafc;
+            --primary-emerald: #065f46; 
+            --secondary-emerald: #059669;
+            --bg-light: #f8fafc;
+            --text-muted: #64748b;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
-        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { color: var(--primary); text-align: center; margin-bottom: 20px; margin-top: 0; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #334155; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        input:focus { outline: 2px solid var(--primary); border-color: transparent; }
-        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: background 0.3s; }
-        button:hover { background: #1d4ed8; }
-        button:disabled { background: #94a3b8; cursor: not-allowed; }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg-light); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px; 
+            box-sizing: border-box; 
+        }
+        
+        .card { 
+            background: white; 
+            padding: 40px 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 400px; 
+            border-top: 6px solid var(--primary-emerald); 
+        }
+
+        h2 { 
+            color: var(--primary-emerald); 
+            text-align: center; 
+            margin-bottom: 30px; 
+            margin-top: 0; 
+            font-weight: 800; 
+            letter-spacing: -0.5px; 
+            font-size: 1.5rem;
+            text-transform: uppercase;
+        }
+        
+        .form-group { margin-bottom: 18px; }
+        
+        label { 
+            display: block; 
+            margin-bottom: 6px; 
+            font-weight: 700; 
+            font-size: 11px; 
+            color: var(--primary-emerald); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+        
+        input { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 10px; 
+            box-sizing: border-box; 
+            font-size: 14px; 
+            transition: all 0.3s;
+            color: #1e293b;
+        }
+
+        input:focus { 
+            outline: none; 
+            border-color: var(--secondary-emerald); 
+            box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1); 
+        }
+        
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            background: var(--primary-emerald); 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            margin-top: 10px; 
+            font-size: 15px; 
+            transition: all 0.3s; 
+            letter-spacing: 0.5px;
+        }
+        
+        button:hover { 
+            background: #044e39; 
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(6, 95, 70, 0.2);
+        }
+
+        button:disabled { 
+            background: #94a3b8; 
+            cursor: not-allowed; 
+        }
+        
         #success-msg { display: none; text-align: center; }
-        .btn-simulasi { background: #10b981; text-decoration: none; display: block; text-align: center; color: white; padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 20px; transition: background 0.3s; }
-        .btn-simulasi:hover { background: #059669; }
+        
+        .btn-simulasi { 
+            background: var(--secondary-emerald); 
+            text-decoration: none; 
+            display: block; 
+            text-align: center; 
+            color: white; 
+            padding: 15px; 
+            border-radius: 12px; 
+            font-weight: 800; 
+            margin-top: 25px; 
+            transition: all 0.3s; 
+        }
+
+        .btn-simulasi:hover { 
+            background: #05855d; 
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
@@ -46,49 +143,47 @@
                 <label>Jenis Usaha (Optional)</label>
                 <input type="text" name="usaha" placeholder="Contoh: Toko, Bengkel, dll">
             </div>
-            <button type="submit" id="btn-submit">Daftar Sekarang</button>
+            <button type="submit" id="btn-submit">DAFTAR SEKARANG</button>
         </form>
     </div>
 
     <div id="success-msg">
-        <div style="font-size: 50px; margin-bottom: 10px;">✅</div>
-        <h3 style="color: #10b981; margin-top: 0;">Registrasi Berhasil!</h3>
-        <p style="color: #64748b;">Data Anda telah tersimpan di sistem kami.</p>
-        <a href="simulasi.html" class="btn-simulasi">Buka Sistem Simulasi →</a>
+        <div style="font-size: 60px; margin-bottom: 15px;">✅</div>
+        <h3 style="color: var(--secondary-emerald); margin-top: 0; font-weight: 800;">Registrasi Berhasil!</h3>
+        <p style="color: var(--text-muted); font-size: 14px;">Data Anda telah tersimpan di sistem kami.</p>
+        <a id="link-simulasi" href="simulasi.html" class="btn-simulasi">Buka Sistem Simulasi →</a>
     </div>
 </div>
 
 <script>
-    // URL dari Deployment Google Apps Script kamu
     const scriptURL = 'https://script.google.com/macros/s/AKfycbx3L-Cf8P7FzmMSYsw1J5_epDl7uFtIMttBK2z0lQ2oy3KkVtixzBgVAqcpEEVCzsjs/exec';
     
     const form = document.getElementById('reg-form');
     const formContainer = document.getElementById('form-container');
     const successMsg = document.getElementById('success-msg');
     const btnSubmit = document.getElementById('btn-submit');
+    const linkSimulasi = document.getElementById('link-simulasi');
 
     form.addEventListener('submit', e => {
         e.preventDefault();
-        
-        // Ubah tombol jadi loading
         btnSubmit.disabled = true;
         btnSubmit.innerText = "Sedang Menyimpan...";
+        
+        const namaInput = document.getElementsByName('nama')[0].value;
         
         fetch(scriptURL, { 
             method: 'POST', 
             body: new FormData(form)
         })
         .then(response => {
-            console.log('Success!', response);
-            // Sembunyikan form, tampilkan pesan sukses
             formContainer.style.display = 'none';
             successMsg.style.display = 'block';
+            linkSimulasi.href = `simulasi.html?mitra=${encodeURIComponent(namaInput)}`;
         })
         .catch(error => {
             btnSubmit.disabled = false;
-            btnSubmit.innerText = "Daftar Sekarang";
+            btnSubmit.innerText = "DAFTAR SEKARANG";
             alert('Waduh, koneksi bermasalah. Coba lagi ya!');
-            console.error('Error!', error.message);
         });
     });
 </script>
