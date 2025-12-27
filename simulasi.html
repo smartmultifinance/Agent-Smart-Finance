@@ -281,25 +281,29 @@
             
             try {
                 const resp = await fetch(`${WEB_APP_URL}?action=getStatus&tim=${tim}&t=${new Date().getTime()}`);
-                const data = await resp.json();
+                const allData = await resp.json();
                 
-                if(!data || data.length === 0) {
-                    container.innerHTML = `<p class="text-center text-xs text-slate-400 py-10">Belum ada pengajuan untuk tim ${tim}</p>`;
+                // FILTER DATA: Hanya ambil data yang nama mitranya COCOK dengan yang sedang login
+                const myData = allData.filter(item => {
+                    const mitraItem = String(item.mitra || "").trim().toLowerCase();
+                    return mitraItem === mitraLogin;
+                });
+
+                if(!myData || myData.length === 0) {
+                    container.innerHTML = `<p class="text-center text-xs text-slate-400 py-10">Anda belum memiliki pengajuan di tim ${tim}</p>`;
                     document.getElementById('total-bonus-cair').innerText = "Rp 0";
                     return;
                 }
 
                 let totalBonusGolive = 0;
 
-                container.innerHTML = data.reverse().map(item => {
+                container.innerHTML = myData.reverse().map(item => {
                     const bonusStr = String(item.bonus || "0").replace(/\D/g, "");
                     const bonusVal = parseInt(bonusStr) || 0;
-                    
                     const statusText = String(item.status || "").trim().toUpperCase();
-                    const mitraItem = String(item.mitra || "").trim().toLowerCase();
 
-                    // HITUNG HANYA JIKA MITRA COCOK DAN STATUS "GOLIVE"
-                    if(mitraItem === mitraLogin && statusText === "GOLIVE") {
+                    // Akumulasi hanya jika status GOLIVE
+                    if(statusText === "GOLIVE") {
                         totalBonusGolive += bonusVal;
                     }
 
@@ -315,7 +319,7 @@
                         <div class="flex justify-between items-center text-[9px]">
                             <div class="flex-1">
                                 <p class="text-slate-500 italic">Ket: ${item.keterangan || '-'}</p>
-                                <p class="text-[8px] text-slate-300 font-bold mt-1 uppercase">Oleh: ${item.mitra || 'Sistem'}</p>
+                                <p class="text-[8px] text-slate-300 font-bold mt-1 uppercase">Oleh: Anda</p>
                             </div>
                             <div class="text-right ml-2">
                                 <p class="text-slate-400 uppercase font-bold">Bonus</p>
