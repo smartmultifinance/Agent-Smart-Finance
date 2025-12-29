@@ -174,7 +174,7 @@
                             </div>
                         </div>
                     </div>
-                    <button id="btn-submit-pengajuan" onclick="submitAplikasiBaru()" class="w-full bg-slate-900 text-white rounded-2xl py-4 font-bold shadow-lg mt-2">KIRIM PENGAJUAN</button>
+                    <button id="btn-submit-pengajuan" onclick="submitAplikasiBaru()" class="w-full bg-slate-900 text-white rounded-2xl py-4 font-bold shadow-lg mt-2 transition-all">KIRIM PENGAJUAN</button>
                 </div>
             </div>
 
@@ -247,9 +247,11 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzATutS18IA3ykUtlKOtyi3nY7ytgZmcNUI3UR09q9BHIsr6I20GOH2eBUUaz4hNewC/exec";
+        // GANTI DENGAN URL WEB APP ANDA
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwNAb9m2rPUR8kX7RCXbFFVvCvvHq9Orb1HGsPVrbSR-TJfu6kCR8IWD-0RADi75fSy/exec";
         let selectedTenor = 12;
 
+        // Label update on file select
         document.getElementById('inp-ktp').onchange = e => document.getElementById('label-ktp').innerText = e.target.files[0].name.substring(0,10);
         document.getElementById('inp-stnk').onchange = e => document.getElementById('label-stnk').innerText = e.target.files[0].name.substring(0,10);
         document.getElementById('inp-pajak').onchange = e => document.getElementById('label-pajak').innerText = e.target.files[0].name.substring(0,10);
@@ -282,15 +284,9 @@
 
             const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const skr = new Date();
-            const bulanSekarang = bulanIndo[skr.getMonth()];
-            const tahunSekarang = skr.getFullYear();
-            
-            if(document.getElementById('current-month-label')) {
-                document.getElementById('current-month-label').innerText = `${bulanSekarang} ${tahunSekarang}`;
-            }
+            document.getElementById('current-month-label').innerText = `${bulanIndo[skr.getMonth()]} ${skr.getFullYear()}`;
 
             try {
-                // Request disesuaikan dengan Apps Script yang baru menggunakan action=getSummary
                 const response = await fetch(`${WEB_APP_URL}?action=getSummary&mitra=${encodeURIComponent(mitraName)}`);
                 const data = await response.json();
                 document.getElementById('sum-golive').innerText = data.golive || 0;
@@ -300,60 +296,68 @@
             } catch (err) { console.error("Summary error", err); }
         }
 
+        // --- FUNGSI BARU: UPLOAD BERTAHAP ---
+        async function uploadFileSingle(id, prefix, nama) {
+            const fileInput = document.getElementById(id);
+            if (!fileInput.files[0]) return "-";
+            
+            const toBase64 = f => new Promise((res) => {
+                const r = new FileReader(); r.readAsDataURL(f);
+                r.onload = () => res(r.result);
+            });
+            
+            const base64Data = await toBase64(fileInput.files[0]);
+            const resp = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: "uploadOnly", fileData: base64Data, prefix, nama })
+            });
+            const res = await resp.json();
+            return res.url || "-";
+        }
+
         async function submitAplikasiBaru() {
             const btn = document.getElementById('btn-submit-pengajuan');
-            const toBase64 = file => new Promise((resolve, reject) => {
-                if(!file) resolve("-");
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-
             const nama = document.getElementById('inp-nama').value;
             const nik = document.getElementById('inp-nik').value;
             const hp = document.getElementById('inp-hp').value;
             const cabang = document.getElementById('inp-cabang-survey').value;
 
-            if(!nama || !nik || !hp || !cabang) { alert("Lengkapi data wajib termasuk Cabang Survey!"); return; }
+            if(!nama || !nik || !hp || !cabang) { alert("Lengkapi data wajib!"); return; }
 
             btn.disabled = true;
-            btn.innerText = "MENGIRIM...";
-
-            const payload = {
-                action: "submitPengajuan",
-                mitra: localStorage.getItem('mitra_name'),
-                tim: localStorage.getItem('mitra_tim'),
-                nama: nama,
-                nik: nik,
-                hp: hp,
-                jenis: document.getElementById('inp-jenis').value,
-                tahun: document.getElementById('inp-tahun').value,
-                cabangSurvey: cabang, // Key ini disamakan dengan Apps Script
-                detail: document.getElementById('inp-detail').value,
-                fileKtp: await toBase64(document.getElementById('inp-ktp').files[0]),
-                fileStnk: await toBase64(document.getElementById('inp-stnk').files[0]),
-                filePajak: await toBase64(document.getElementById('inp-pajak').files[0])
-            };
+            btn.innerText = "MENGUNGGAH FOTO...";
 
             try {
-                const resp = await fetch(WEB_APP_URL, { 
-                    method: 'POST', 
-                    body: JSON.stringify(payload) 
-                });
+                // Proses Upload Foto satu per satu
+                const linkKtp = await uploadFileSingle('inp-ktp', 'KTP', nama);
+                const linkStnk = await uploadFileSingle('inp-stnk', 'STNK', nama);
+                const linkPajak = await uploadFileSingle('inp-pajak', 'PAJAK', nama);
+
+                btn.innerText = "MENGIRIM FORMULIR...";
+
+                const payload = {
+                    action: "submitPengajuan",
+                    mitra: localStorage.getItem('mitra_name'),
+                    tim: localStorage.getItem('mitra_tim'),
+                    nama, nik, hp,
+                    jenis: document.getElementById('inp-jenis').value,
+                    tahun: document.getElementById('inp-tahun').value,
+                    cabangSurvey: cabang,
+                    detail: document.getElementById('inp-detail').value,
+                    fileKtp: linkKtp, fileStnk: linkStnk, filePajak: linkPajak
+                };
+
+                const resp = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
                 const res = await resp.json();
                 if(res.result === "success") {
-                    alert("Pengajuan Berhasil Terkirim!");
+                    alert("Pengajuan Berhasil!");
                     location.reload();
-                } else {
-                    alert("Gagal: " + res.message);
                 }
-            } catch (e) { 
-                alert("Pengajuan sedang diproses. Silahkan cek menu Status Aplikasi beberapa saat lagi."); 
-                location.reload(); 
-            } finally { 
-                btn.disabled = false; 
-                btn.innerText = "KIRIM PENGAJUAN"; 
+            } catch (e) {
+                alert("Koneksi bermasalah, silakan coba lagi.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "KIRIM PENGAJUAN";
             }
         }
 
@@ -363,48 +367,59 @@
             const mitraLogin = (localStorage.getItem('mitra_name') || "").trim().toLowerCase();
             
             loadSummaryData(); 
+            container.innerHTML = `<p class="text-center text-xs text-slate-400 py-10">Memuat data...</p>`;
 
             try {
-                const resp = await fetch(`${WEB_APP_URL}?action=getStatus&tim=${encodeURIComponent(tim)}&t=${new Date().getTime()}`);
+                const resp = await fetch(`${WEB_APP_URL}?action=getStatus&tim=${encodeURIComponent(tim)}`);
                 const data = await resp.json();
                 
-                if(!data || data.length === 0) {
-                    container.innerHTML = `<p class="text-center text-xs text-slate-400 py-10">Belum ada pengajuan untuk tim ${tim}</p>`;
-                    document.getElementById('total-bonus-cair').innerText = "Rp 0";
-                    return;
-                }
-
                 let totalBonusGolive = 0;
                 let listHtml = "";
 
                 data.reverse().forEach(item => {
-                    const statusText = String(item.status || "").trim().toUpperCase();
-                    const mitraItem = String(item.mitra || "").trim().toLowerCase();
-                    const bonusVal = parseInt(item.bonus) || 0;
+                    if(item.mitra.toLowerCase() === mitraLogin) {
+                        const s = (item.status || "").toUpperCase();
+                        const bonusVal = parseInt(item.bonus) || 0;
+                        if(s === "GOLIVE") totalBonusGolive += bonusVal;
 
-                    if(mitraItem === mitraLogin) {
-                        if(statusText === "GOLIVE") {
-                            totalBonusGolive += bonusVal;
-                        }
+                        // --- VISUAL STEPPER LOGIC ---
+                        const steps = ["PROSES", "KOMITE", "APPROVE", "GOLIVE"];
+                        const currentStepIdx = steps.indexOf(s);
+                        
+                        let stepperHtml = `<div class="flex items-center justify-between px-2 py-4 bg-slate-50 rounded-2xl my-3">`;
+                        steps.forEach((stepName, idx) => {
+                            const isDone = idx <= currentStepIdx && s !== "REJECT" && s !== "CANCEL";
+                            const isFail = (s === "REJECT" || s === "CANCEL") && idx <= 1;
+                            
+                            stepperHtml += `
+                                <div class="flex flex-col items-center flex-1 relative">
+                                    <div class="w-5 h-5 rounded-full z-10 flex items-center justify-center text-[8px] font-bold ${isDone ? 'bg-orange-600 text-white' : isFail ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-400'}">${idx + 1}</div>
+                                    <span class="text-[7px] mt-1 font-bold ${isDone ? 'text-orange-600' : 'text-slate-400'}">${stepName}</span>
+                                    ${idx < 3 ? `<div class="absolute w-full h-[2px] left-1/2 top-2.5 -z-0 ${idx < currentStepIdx && s !== "REJECT" ? 'bg-orange-600' : 'bg-slate-200'}"></div>` : ''}
+                                </div>`;
+                        });
+                        stepperHtml += `</div>`;
 
                         let sColor = "bg-orange-50 text-orange-600";
-                        if(statusText === "GOLIVE") sColor = "bg-green-50 text-green-600";
-                        if(statusText === "REJECT") sColor = "bg-red-50 text-red-600";
-                        if(statusText === "CANCEL" || statusText === "LOSS DEAL" || statusText === "LOSS") sColor = "bg-gray-100 text-gray-500";
+                        if(s === "GOLIVE") sColor = "bg-green-50 text-green-600";
+                        if(s === "REJECT" || s === "CANCEL") sColor = "bg-red-50 text-red-600";
 
                         listHtml += `
-                        <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-4">
-                            <div class="flex justify-between items-start border-b border-slate-50 pb-3">
+                        <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-3">
+                            <div class="flex justify-between items-start border-b border-slate-50 pb-2">
                                 <div>
-                                    <h4 class="font-bold text-slate-900 text-sm">${item.nama || '-'}</h4>
-                                    <p class="text-[10px] text-slate-400 font-medium">${item.unit || ''} ${item.tahun || ''}</p>
+                                    <h4 class="font-bold text-slate-900 text-sm">${item.nama}</h4>
+                                    <p class="text-[10px] text-slate-400 font-medium">${item.unit}</p>
                                 </div>
-                                <span class="${sColor} text-[10px] font-bold px-2 py-1 rounded-full uppercase">${item.status || 'PROSES'}</span>
+                                <span class="${sColor} text-[10px] font-bold px-2 py-1 rounded-full uppercase">${s}</span>
                             </div>
-                            <div class="flex justify-between items-center text-[9px]">
+                            
+                            ${stepperHtml}
+
+                            <div class="flex justify-between items-end text-[9px]">
                                 <div class="flex-1">
                                     <p class="text-slate-500 italic">Ket: ${item.keterangan || '-'}</p>
-                                    <p class="text-[8px] text-slate-300 font-bold mt-1 uppercase">Oleh: ${item.mitra || 'Sistem'}</p>
+                                    <p class="text-[8px] text-slate-300 font-bold mt-1 uppercase">Oleh: ${item.mitra}</p>
                                 </div>
                                 <div class="text-right ml-2">
                                     <p class="text-slate-400 uppercase font-bold">Bonus</p>
@@ -415,14 +430,15 @@
                     }
                 });
                 
-                container.innerHTML = listHtml || `<p class="text-center text-xs text-slate-400 py-10">Data tidak ditemukan untuk nama ${mitraLogin}</p>`;
+                container.innerHTML = listHtml || `<p class="text-center text-xs text-slate-400 py-10">Data tidak ditemukan.</p>`;
                 document.getElementById('total-bonus-cair').innerText = "Rp " + totalBonusGolive.toLocaleString('id-ID');
 
             } catch (e) { 
-                container.innerHTML = `<p class="text-center text-xs text-red-400 py-10">Gagal memuat status aplikasi.</p>`; 
+                container.innerHTML = `<p class="text-center text-xs text-red-400 py-10">Gagal memuat status.</p>`; 
             }
         }
 
+        // SIMULASI FUNCTIONS
         function formatNumber(n) { return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
         function cleanNumber(s) { return parseInt(s.replace(/\./g, "")) || 0; }
 
@@ -502,14 +518,9 @@
         window.onload = () => {
             lucide.createIcons();
             updateTenorOptions();
-            
             const mitraName = localStorage.getItem('mitra_name');
-            if (mitraName) {
-                document.getElementById('welcome-text').innerText = `Halo, ${mitraName} - Partner Portal`;
-            }
+            if (mitraName) document.getElementById('welcome-text').innerText = `Halo, ${mitraName} - Partner Portal`;
         };
     </script>
 </body>
 </html>
-
-
