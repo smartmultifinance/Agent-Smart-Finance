@@ -247,7 +247,7 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzPLVaOeiEiL3XyXBc6yXV-rEzEQ8AK-d3o-KihvdMk2jVttYcGp_knNJxcJd0392TT/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzATutS18IA3ykUtlKOtyi3nY7ytgZmcNUI3UR09q9BHIsr6I20GOH2eBUUaz4hNewC/exec";
         let selectedTenor = 12;
 
         document.getElementById('inp-ktp').onchange = e => document.getElementById('label-ktp').innerText = e.target.files[0].name.substring(0,10);
@@ -255,9 +255,8 @@
         document.getElementById('inp-pajak').onchange = e => document.getElementById('label-pajak').innerText = e.target.files[0].name.substring(0,10);
 
         function handleLogout() {
-            if(confirm("Apakah Anda yakin ingin logout?")) {
-                localStorage.clear();
-                location.reload();
+            if(confirm("Kembali ke Halaman Utama?")) {
+                window.location.href = "index.html"; 
             }
         }
 
@@ -291,6 +290,7 @@
             }
 
             try {
+                // Sesuai script .gs: getSummary membutuhkan parameter mitra, bulan, tahun
                 const response = await fetch(`${WEB_APP_URL}?action=getSummary&mitra=${encodeURIComponent(mitraName)}&bulan=${skr.getMonth() + 1}&tahun=${tahunSekarang}`);
                 const data = await response.json();
                 document.getElementById('sum-golive').innerText = data.golive || 0;
@@ -303,7 +303,7 @@
         async function submitAplikasiBaru() {
             const btn = document.getElementById('btn-submit-pengajuan');
             const toBase64 = file => new Promise((resolve, reject) => {
-                if(!file) resolve("");
+                if(!file) resolve("-");
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = () => resolve(reader.result);
@@ -313,9 +313,9 @@
             const nama = document.getElementById('inp-nama').value;
             const nik = document.getElementById('inp-nik').value;
             const hp = document.getElementById('inp-hp').value;
-            const cabangSurvey = document.getElementById('inp-cabang-survey').value;
+            const cabang = document.getElementById('inp-cabang-survey').value;
 
-            if(!nama || !nik || !hp || !cabangSurvey) { alert("Lengkapi data wajib termasuk Cabang Survey!"); return; }
+            if(!nama || !nik || !hp || !cabang) { alert("Lengkapi data wajib termasuk Cabang Survey!"); return; }
 
             btn.disabled = true;
             btn.innerText = "MENGIRIM...";
@@ -329,7 +329,7 @@
                 hp: hp,
                 jenis: document.getElementById('inp-jenis').value,
                 tahun: document.getElementById('inp-tahun').value,
-                cabangSurvey: cabangSurvey,
+                cabangSurvey: cabang,
                 detail: document.getElementById('inp-detail').value,
                 fileKtp: await toBase64(document.getElementById('inp-ktp').files[0]),
                 fileStnk: await toBase64(document.getElementById('inp-stnk').files[0]),
@@ -337,7 +337,6 @@
             };
 
             try {
-                // Gunakan mode cors untuk POST
                 const resp = await fetch(WEB_APP_URL, { 
                     method: 'POST', 
                     body: JSON.stringify(payload) 
@@ -346,9 +345,16 @@
                 if(res.result === "success") {
                     alert("Pengajuan Berhasil Terkirim!");
                     location.reload();
+                } else {
+                    alert("Gagal: " + res.message);
                 }
-            } catch (e) { alert("Pengajuan Terkirim! (Cek sheet jika tidak ada pesan sukses)"); location.reload(); } 
-            finally { btn.disabled = false; btn.innerText = "KIRIM PENGAJUAN"; }
+            } catch (e) { 
+                alert("Pengajuan sedang diproses. Silahkan cek menu Status Aplikasi beberapa saat lagi."); 
+                location.reload(); 
+            } finally { 
+                btn.disabled = false; 
+                btn.innerText = "KIRIM PENGAJUAN"; 
+            }
         }
 
         async function fetchStatusData() {
@@ -369,13 +375,16 @@
                 }
 
                 let totalBonusGolive = 0;
+                let listHtml = "";
 
-                container.innerHTML = data.reverse().map(item => {
-                    const bonusStr = String(item.bonus || "0").replace(/\D/g, "");
-                    const bonusVal = parseInt(bonusStr) || 0;
+                // Reverse agar data terbaru di atas
+                data.reverse().forEach(item => {
                     const statusText = String(item.status || "").trim().toUpperCase();
                     const mitraItem = String(item.mitra || "").trim().toLowerCase();
+                    const bonusStr = String(item.bonus || "0").replace(/\D/g, "");
+                    const bonusVal = parseInt(bonusStr) || 0;
 
+                    // Filter hanya data milik mitra yang sedang login
                     if(mitraItem === mitraLogin) {
                         if(statusText === "GOLIVE") {
                             totalBonusGolive += bonusVal;
@@ -386,7 +395,7 @@
                         if(statusText === "REJECT") sColor = "bg-red-50 text-red-600";
                         if(statusText === "CANCEL" || statusText === "LOSS DEAL") sColor = "bg-gray-100 text-gray-500";
 
-                        return `
+                        listHtml += `
                         <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-4">
                             <div class="flex justify-between items-start border-b border-slate-50 pb-3">
                                 <div>
@@ -407,9 +416,9 @@
                             </div>
                         </div>`;
                     }
-                    return "";
-                }).join('');
+                });
                 
+                container.innerHTML = listHtml || `<p class="text-center text-xs text-slate-400 py-10">Data tidak ditemukan untuk nama ${mitraLogin}</p>`;
                 document.getElementById('total-bonus-cair').innerText = "Rp " + totalBonusGolive.toLocaleString('id-ID');
 
             } catch (e) { 
@@ -505,4 +514,3 @@
     </script>
 </body>
 </html>
-
