@@ -222,7 +222,8 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwNAb9m2rPUR8kX7RCXbFFVvCvvHq9Orb1HGsPVrbSR-TJfu6kCR8IWD-0RADi75fSy/exec";
+        // Update URL dengan Apps Script Anda
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxsorp6OQZMOfa_KI7bPKvKRXMlmOqKHSWvA2UYSTXAe4hxsXrnKnxtEEQl4ZU3Lyui/exec";
         let selectedTenor = 12;
 
         document.getElementById('inp-ktp').onchange = e => document.getElementById('label-ktp').innerText = e.target.files[0].name.substring(0,12);
@@ -230,7 +231,10 @@
         document.getElementById('inp-pajak').onchange = e => document.getElementById('label-pajak').innerText = e.target.files[0].name.substring(0,12);
 
         function handleLogout() {
-            if(confirm("Logout dari aplikasi?")) { window.location.href = "index.html"; }
+            if(confirm("Logout dari aplikasi?")) { 
+                localStorage.clear();
+                window.location.href = "index.html"; 
+            }
         }
 
         function switchTab(tab) {
@@ -283,42 +287,32 @@
                         const bonusVal = parseInt(item.bonus) || 0;
                         if(s === "GOLIVE") totalBonusGolive += bonusVal;
 
-                        // --- LOGIKA SLA PENYEMPURNAAN ---
                         const tglUpdate = new Date(item.tanggalUpdate || item.tanggalInput);
                         const diffMs = Math.abs(new Date() - tglUpdate);
-                        
-                        const totalMinutes = Math.floor(diffMs / 60000);
-                        const totalHours = Math.floor(totalMinutes / 60);
-                        const d = Math.floor(totalHours / 24);
-                        const h = totalHours % 24;
-                        const m = totalMinutes % 60;
-
-                        let slaText = "";
-                        if (d > 0) {
-                            slaText = `${d} Hari, ${h} Jam`;
-                        } else if (h > 0) {
-                            slaText = `${h} Jam, ${m} Menit`;
-                        } else {
-                            slaText = `${m} Menit`;
-                        }
+                        const m = Math.floor(diffMs / 60000);
+                        const h = Math.floor(m / 60);
+                        const d = Math.floor(h / 24);
+                        let slaText = d > 0 ? `${d} Hari` : (h > 0 ? `${h} Jam` : `${m % 60} Menit`);
 
                         const steps = ["PROSES", "SURVEY", "KOMITE", "APPROVE", "GOLIVE"];
                         const isFailed = (s === "REJECT" || s === "CANCEL");
                         let currentStepIdx = steps.indexOf(s);
+
+                        // Update Khusus: Penanda Revisi (Indikator 2x revisi)
+                        let revisiWarning = "";
+                        if (item.revisiCount > 0) {
+                            revisiWarning = `<span class="ml-2 text-[8px] px-1.5 py-0.5 bg-red-600 text-white rounded font-bold italic animate-pulse">REVISI KE-${item.revisiCount}</span>`;
+                        }
 
                         let stepperHtml = `<div class="flex items-center justify-between px-1 py-4 bg-slate-50 rounded-2xl my-3">`;
                         steps.forEach((stepName, idx) => {
                             const isDone = !isFailed && idx <= currentStepIdx;
                             const isActiveStep = (idx === currentStepIdx);
                             const isFailPoint = isFailed && idx === currentStepIdx;
-                            
                             stepperHtml += `
                                 <div class="flex flex-col items-center flex-1 relative">
-                                    <div class="absolute -top-3.5 text-[5px] font-bold text-orange-500 whitespace-nowrap italic">
-                                        ${isActiveStep && !isFailed && s !== "GOLIVE" ? slaText : ""}
-                                    </div>
-                                    <div class="w-4 h-4 rounded-full z-10 flex items-center justify-center text-[7px] font-bold 
-                                        ${isDone ? 'bg-orange-600 text-white' : (isFailPoint ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-400')}">
+                                    <div class="absolute -top-3.5 text-[5px] font-bold text-orange-500 whitespace-nowrap italic">${isActiveStep && !isFailed && s !== "GOLIVE" ? slaText : ""}</div>
+                                    <div class="w-4 h-4 rounded-full z-10 flex items-center justify-center text-[7px] font-bold ${isDone ? 'bg-orange-600 text-white' : (isFailPoint ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-400')}">
                                         ${isFailPoint ? 'X' : idx + 1}
                                     </div>
                                     <span class="text-[6px] mt-1 font-bold ${isDone ? 'text-orange-600' : 'text-slate-400'}">${stepName}</span>
@@ -327,13 +321,13 @@
                         });
                         stepperHtml += `</div>`;
 
-                        let sColor = s === "GOLIVE" ? "bg-green-50 text-green-600" : (isFailed ? "bg-red-50 text-red-600" : "bg-orange-50 text-orange-600");
+                        let sColor = s === "GOLIVE" ? "bg-green-50 text-green-600" : (isFailed ? "bg-red-50 text-red-600" : (s === "REVISI" ? "bg-red-100 text-red-700 font-black border border-red-200" : "bg-orange-50 text-orange-600"));
 
                         listHtml += `
                         <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-3">
                             <div class="flex justify-between items-start border-b border-slate-50 pb-2">
                                 <div>
-                                    <h4 class="font-bold text-slate-900 text-sm">${item.nama}</h4>
+                                    <h4 class="font-bold text-slate-900 text-sm flex items-center">${item.nama} ${revisiWarning}</h4>
                                     <p class="text-[10px] text-slate-400 font-medium">${item.unit}</p>
                                 </div>
                                 <span class="${sColor} text-[10px] font-bold px-2 py-1 rounded-full uppercase">${s}</span>
@@ -342,7 +336,7 @@
                             <div class="flex justify-between items-end text-[9px]">
                                 <div class="flex-1">
                                     <p class="text-slate-500 italic">Ket: ${item.keterangan || '-'}</p>
-                                    <p class="text-[8px] text-slate-300 font-bold mt-1 uppercase tracking-tighter">Durasi Tahap: ${slaText}</p>
+                                    <p class="text-[8px] text-slate-300 font-bold mt-1 uppercase tracking-tighter">ID: ${item.id} | Update: ${slaText} Lalu</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-slate-400 uppercase font-bold text-[7px]">Bonus Cair</p>
