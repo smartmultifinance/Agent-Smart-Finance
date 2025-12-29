@@ -28,6 +28,8 @@
             display: none; position: fixed; inset: 0; z-index: 50;
             align-items: center; justify-content: center; padding: 1rem;
         }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="min-h-screen pb-20">
@@ -54,15 +56,15 @@
             <h2 id="welcome-text" class="text-2xl font-extrabold text-slate-900 tracking-tight">Halo, Partner Portal</h2>
             <p class="text-slate-500 text-sm mt-1 flex items-center gap-1">
                 <i data-lucide="calendar" class="w-3 h-3"></i>
-                <span id="current-date">-- Januari 2025</span>
+                <span id="current-date">-- Desember 2025</span>
             </p>
         </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4 flex gap-8 border-b border-slate-200 mb-6 overflow-x-auto scrollbar-hide">
-        <button onclick="switchTab('simulasi')" id="tab-simulasi" class="tab-btn active pb-4 px-2 text-sm font-bold whitespace-nowrap transition-all">SIMULASI</button>
-        <button onclick="switchTab('pengajuan')" id="tab-pengajuan" class="tab-btn pb-4 px-2 text-sm font-bold whitespace-nowrap transition-all">INPUT DATA</button>
-        <button onclick="switchTab('status')" id="tab-status" class="tab-btn pb-4 px-2 text-sm font-bold whitespace-nowrap transition-all">RIWAYAT & STATUS</button>
+        <button onclick="switchTab('simulasi')" id="tab-simulasi" class="tab-btn active pb-4 px-2 text-sm font-bold whitespace-nowrap transition-all uppercase">SIMULASI</button>
+        <button onclick="switchTab('pengajuan')" id="tab-pengajuan" class="tab-btn pb-4 px-2 text-sm font-bold whitespace-nowrap transition-all uppercase">INPUT DATA</button>
+        <button onclick="switchTab('status')" id="tab-status" class="tab-btn pb-4 px-2 text-sm font-bold whitespace-nowrap transition-all uppercase">RIWAYAT & STATUS</button>
     </div>
 
     <div id="page-simulasi" class="max-w-3xl mx-auto px-4 space-y-6">
@@ -71,20 +73,19 @@
             <div class="relative">
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-slate-400">Rp</span>
                 <input type="number" id="amount-input" value="10000000" oninput="calculateSimulasi()" 
-                    class="w-full pl-14 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-2xl font-black text-slate-800 focus:border-orange-500 focus:ring-0 transition-all">
+                    class="w-full pl-14 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-2xl font-black text-slate-800 focus:border-orange-500 focus:ring-0 transition-all outline-none">
             </div>
             <div class="grid grid-cols-4 gap-2 mt-4">
-                <button onclick="setAmount(5000000)" class="py-2 text-xs font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-orange-100 transition-colors">5 JT</button>
-                <button onclick="setAmount(10000000)" class="py-2 text-xs font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-orange-100 transition-colors">10 JT</button>
-                <button onclick="setAmount(20000000)" class="py-2 text-xs font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-orange-100 transition-colors">20 JT</button>
-                <button onclick="setAmount(50000000)" class="py-2 text-xs font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-orange-100 transition-colors">50 JT</button>
+                <button onclick="setAmount(5000000)" class="py-2 text-xs font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-orange-100 transition-colors uppercase">5 JT</button>
+                <button onclick="setAmount(10000000)" class="py-2 text-xs font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-orange-100 transition-colors uppercase">10 JT</button>
+                <button onclick="setAmount(25000000)" class="py-2 text-xs font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-orange-100 transition-colors uppercase">25 JT</button>
+                <button onclick="setAmount(50000000)" class="py-2 text-xs font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-orange-100 transition-colors uppercase">50 JT</button>
             </div>
         </div>
 
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-orange-50">
             <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Jangka Waktu (Bulan)</label>
-            <div id="tenor-container" class="grid grid-cols-3 gap-3">
-                </div>
+            <div id="tenor-container" class="grid grid-cols-3 gap-3"></div>
         </div>
 
         <div class="bg-orange-600 p-8 rounded-[2.5rem] shadow-xl shadow-orange-200 text-white relative overflow-hidden">
@@ -112,7 +113,7 @@
         </button>
     </div>
 
-    <div id="page-pengajuan" class="hidden max-w-3xl mx-auto px-4 space-y-6 pb-20">
+    <div id="page-pengajuan" class="hidden max-w-3xl mx-auto px-4 space-y-6">
         <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-orange-50 space-y-6">
             <div class="flex items-center gap-4 mb-4">
                 <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center">
@@ -123,156 +124,47 @@
                     <p class="text-sm text-slate-400">Lengkapi data calon nasabah</p>
                 </div>
             </div>
-
             <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase ml-1 mb-2">Nama Lengkap Sesuai KTP</label>
-                    <input type="text" id="inp-nama" class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 transition-all">
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase ml-1 mb-2">Nomor NIK (16 Digit)</label>
-                        <input type="number" id="inp-nik" class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase ml-1 mb-2">Nomor WhatsApp/HP</label>
-                        <input type="number" id="inp-hp" class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 transition-all">
-                    </div>
-                </div>
-            </div>
-
-            <div class="pt-6 border-t border-slate-100 space-y-4">
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center">
-                        <i data-lucide="car" class="w-6 h-6"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-extrabold text-slate-800">Detail Kendaraan</h3>
-                        <p class="text-sm text-slate-400">Informasi unit jaminan</p>
-                    </div>
-                </div>
+                <input type="text" id="debitur-name" placeholder="Nama Lengkap Nasabah" class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 outline-none transition-all">
+                <input type="number" id="debitur-hp" placeholder="Nomor WhatsApp/HP Nasabah" class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 outline-none transition-all">
                 
+                <h3 class="text-lg font-extrabold text-slate-800 pt-4 flex items-center gap-2">
+                    <i data-lucide="car" class="w-5 h-5 text-orange-600"></i> Data Kendaraan
+                </h3>
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase ml-1 mb-2">Jenis Kendaraan</label>
-                        <select id="inp-jenis" class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 transition-all">
-                            <option value="MOTOR">MOTOR</option>
-                            <option value="MOBIL">MOBIL</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase ml-1 mb-2">Tahun</label>
-                        <input type="number" id="inp-tahun" placeholder="Contoh: 2020" class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 transition-all">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase ml-1 mb-2">Tipe / Model Kendaraan</label>
-                    <input type="text" id="inp-detail" placeholder="Contoh: Honda Vario 150" class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 transition-all">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase ml-1 mb-2">Cabang Survey</label>
-                    <select id="inp-cabang" class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 transition-all">
-                        <option value="JAYAPURA">JAYAPURA</option>
-                        <option value="SORONG">SORONG</option>
-                        <option value="MANOKWARI">MANOKWARI</option>
-                        <option value="AMBON">AMBON</option>
-                        <option value="MERAUKE">MERAUKE</option>
-                        <option value="NABIRE">NABIRE</option>
+                    <select id="vehicle-type" class="px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 outline-none" onchange="updateTenorOptions()">
+                        <option value="MOTOR">MOTOR</option>
+                        <option value="MOBIL">MOBIL</option>
                     </select>
+                    <input type="number" id="vehicle-year" placeholder="Tahun Unit" class="px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 outline-none">
                 </div>
+                <input type="text" id="vehicle-model" placeholder="Tipe / Model (Contoh: Honda Vario 150)" class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 outline-none transition-all">
             </div>
-
-            <div class="pt-6 border-t border-slate-100 space-y-4">
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center">
-                        <i data-lucide="camera" class="w-6 h-6"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-extrabold text-slate-800">Upload Berkas</h3>
-                        <p class="text-sm text-slate-400">Foto KTP, STNK, dan Pajak</p>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 gap-3">
-                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                        <span class="text-sm font-bold text-slate-600">Foto KTP</span>
-                        <input type="file" id="inp-ktp" class="hidden" accept="image/*">
-                        <label for="inp-ktp" id="label-ktp" class="bg-white px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold shadow-sm">PILIH FOTO</label>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                        <span class="text-sm font-bold text-slate-600">Foto STNK</span>
-                        <input type="file" id="inp-stnk" class="hidden" accept="image/*">
-                        <label for="inp-stnk" id="label-stnk" class="bg-white px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold shadow-sm">PILIH FOTO</label>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                        <span class="text-sm font-bold text-slate-600">Foto Pajak</span>
-                        <input type="file" id="inp-pajak" class="hidden" accept="image/*">
-                        <label for="inp-pajak" id="label-pajak" class="bg-white px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold shadow-sm">PILIH FOTO</label>
-                    </div>
-                </div>
-            </div>
-
             <button onclick="submitPengajuan()" id="btn-submit" class="w-full bg-orange-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-orange-100 active:scale-[0.98] transition-all">
-                KIRIM PENGAJUAN SEKARANG
+                SIMPAN PENGAJUAN SEKARANG
             </button>
         </div>
     </div>
 
     <div id="page-status" class="hidden max-w-5xl mx-auto px-4 space-y-6">
-        <div class="flex items-center justify-between mb-2">
-            <h3 class="text-lg font-black text-slate-800">Monitoring Progress</h3>
-            <button onclick="fetchStatus()" class="p-2 bg-white rounded-xl shadow-sm border border-slate-100 text-orange-600">
-                <i data-lucide="refresh-cw" class="w-5 h-5"></i>
-            </button>
-        </div>
-
-        <div id="stats-container" class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="bg-white p-4 rounded-2xl border border-orange-50 shadow-sm">
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Total Input</p>
-                <p id="stat-total" class="text-xl font-black text-slate-800">0</p>
-            </div>
-            <div class="bg-white p-4 rounded-2xl border border-orange-50 shadow-sm">
-                <p class="text-[10px] font-bold text-green-500 uppercase">Go Live</p>
-                <p id="stat-golive" class="text-xl font-black text-green-600">0</p>
-            </div>
-            <div class="bg-white p-4 rounded-2xl border border-orange-50 shadow-sm">
-                <p class="text-[10px] font-bold text-red-400 uppercase">Reject</p>
-                <p id="stat-reject" class="text-xl font-black text-red-600">0</p>
-            </div>
-            <div class="bg-white p-4 rounded-2xl border border-orange-50 shadow-sm">
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Cancel/Loss</p>
-                <p id="stat-cancel" class="text-xl font-black text-slate-600">0</p>
-            </div>
-        </div>
-
-        <div id="status-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            </div>
+        <div id="status-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </div>
 
-    <div id="modal-detail" class="modal-overlay flex">
+    <div id="modal-detail" class="modal-overlay">
         <div class="bg-white w-full max-w-lg rounded-[2.5rem] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
             <div class="bg-slate-900 p-6 text-white flex justify-between items-center">
                 <h3 class="text-xl font-extrabold">Detail Pengajuan</h3>
-                <button onclick="closeModal()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
+                <button onclick="closeModal()" class="p-2 hover:bg-white/10 rounded-full transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
-            <div id="modal-content" class="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
-                </div>
-            <div id="modal-footer" class="p-6 border-t border-slate-100 bg-slate-50 flex gap-3">
-                </div>
+            <div id="modal-content" class="p-8 space-y-6 max-h-[70vh] overflow-y-auto"></div>
+            <div id="modal-footer" class="p-6 border-t border-slate-100 bg-slate-50 flex gap-3"></div>
         </div>
     </div>
 
     <script>
-        // SCRIPT BERSIH: Hapus deklarasi ganda, gunakan yang terbaru
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxnBZGoqWenNKVMff4pQetXr_aEBUmpAbj3kd4CdbYVkP_ruch0wbh-X8q6hGlWAXEO/exec";
         
         let selectedTenor = 12;
-
-        document.getElementById('inp-ktp').onchange = e => document.getElementById('label-ktp').innerText = e.target.files[0].name.substring(0,12);
-        document.getElementById('inp-stnk').onchange = e => document.getElementById('label-stnk').innerText = e.target.files[0].name.substring(0,12);
-        document.getElementById('inp-pajak').onchange = e => document.getElementById('label-pajak').innerText = e.target.files[0].name.substring(0,12);
 
         function switchTab(tab) {
             ['simulasi', 'pengajuan', 'status'].forEach(t => {
@@ -281,7 +173,7 @@
             });
             document.getElementById('page-' + tab).classList.remove('hidden');
             document.getElementById('tab-' + tab).classList.add('active');
-            if (tab === 'status') { fetchStatus(); fetchSummary(); }
+            if (tab === 'status') fetchStatus();
         }
 
         function setAmount(val) {
@@ -291,7 +183,7 @@
 
         function updateTenorOptions() {
             const container = document.getElementById('tenor-container');
-            const type = document.getElementById('inp-jenis').value;
+            const type = document.getElementById('vehicle-type').value;
             const options = type === 'MOTOR' ? [12, 18, 24, 30, 36] : [12, 24, 36, 48];
             container.innerHTML = options.map(t => `
                 <button onclick="selectTenor(${t})" class="tenor-btn p-4 rounded-2xl border-2 border-slate-100 font-bold text-sm ${selectedTenor === t ? 'active' : ''}">
@@ -301,8 +193,6 @@
             calculateSimulasi();
         }
 
-        document.getElementById('inp-jenis').onchange = updateTenorOptions;
-
         function selectTenor(t) {
             selectedTenor = t;
             updateTenorOptions();
@@ -310,81 +200,49 @@
 
         function calculateSimulasi() {
             const plafon = parseFloat(document.getElementById('amount-input').value) || 0;
-            const type = document.getElementById('inp-jenis').value;
-            const rate = type === 'MOTOR' ? 0.03 : 0.02; // Asumsi rate flat
+            const type = document.getElementById('vehicle-type').value;
+            const rate = type === 'MOTOR' ? 0.025 : 0.018; 
             const totalBunga = plafon * rate * (selectedTenor / 12);
             const angsuran = Math.ceil((plafon + totalBunga) / selectedTenor);
-            
             document.getElementById('installment-result').innerText = 'Rp ' + angsuran.toLocaleString();
             document.getElementById('res-plafon').innerText = 'Rp ' + plafon.toLocaleString();
             document.getElementById('res-tenor').innerText = selectedTenor + ' Bulan';
         }
 
-        async function fetchSummary() {
-            const tim = localStorage.getItem('mitra_tim');
-            const mitra = localStorage.getItem('mitra_name');
-            try {
-                const res = await fetch(`${WEB_APP_URL}?action=getSummary&tim=${encodeURIComponent(tim)}&mitra=${encodeURIComponent(mitra)}`);
-                const data = await res.json();
-                document.getElementById('stat-total').innerText = data.total;
-                document.getElementById('stat-golive').innerText = data.golive;
-                document.getElementById('stat-reject').innerText = data.reject;
-                document.getElementById('stat-cancel').innerText = data.cancel;
-            } catch (e) { console.error(e); }
-        }
-
         async function fetchStatus() {
             const container = document.getElementById('status-list');
             container.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 font-bold">Sedang memuat data...</div>`;
-            
-            const tim = localStorage.getItem('mitra_tim');
-            const nama = localStorage.getItem('mitra_name');
+            const tim = (localStorage.getItem('mitra_tim') || "").toUpperCase();
+            const nama = (localStorage.getItem('mitra_name') || "").toUpperCase();
 
             try {
                 const res = await fetch(`${WEB_APP_URL}?action=getStatus&tim=${encodeURIComponent(tim)}&nama=${encodeURIComponent(nama)}`);
                 const data = await res.json();
                 
-                if (data.length === 0) {
+                if (!data.length) {
                     container.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 font-bold">Belum ada pengajuan.</div>`;
                     return;
                 }
 
-                container.innerHTML = data.reverse().map(item => {
-                    let color = "slate";
-                    if(item.status === "GOLIVE") color = "green";
-                    else if(item.status === "REJECT") color = "red";
-                    else if(item.status === "REVISI") color = "orange";
-                    else if(item.status === "CANCEL") color = "gray";
-                    else if(item.status === "PROSES") color = "blue";
-
-                    return `
-                    <div onclick='showDetail(${JSON.stringify(item)})' class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+                container.innerHTML = data.reverse().map(item => `
+                    <div onclick='showDetail(${JSON.stringify(item)})' class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <span class="px-3 py-1 bg-${color}-100 text-${color}-600 rounded-full text-[10px] font-black uppercase tracking-widest">${item.status}</span>
+                            <span class="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-[10px] font-black uppercase tracking-widest">${item.status}</span>
                             <span class="text-[10px] text-slate-400 font-bold uppercase">${new Date(item.tanggalInput).toLocaleDateString('id-ID')}</span>
                         </div>
-                        <h4 class="font-bold text-slate-900 text-sm flex items-center">${item.nama}</h4>
-                        <p class="text-xs text-slate-500 mt-1">${item.unit} (${item.tahun})</p>
-                        <div class="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
-                            <span class="text-[10px] font-bold text-slate-400">ID: ${item.id}</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 group-hover:text-orange-500 transition-colors"></i>
-                        </div>
-                    </div>`;
-                }).join('');
+                        <h4 class="font-bold text-slate-900 text-sm">${item.nama}</h4>
+                        <p class="text-xs text-slate-500 mt-1">${item.unit}</p>
+                    </div>`).join('');
                 lucide.createIcons();
-            } catch (e) { 
-                container.innerHTML = `<div class="col-span-full py-10 text-center text-red-400 font-bold">Gagal memuat data.</div>`;
-            }
+            } catch (e) { container.innerHTML = `<div class="col-span-full py-10 text-center text-red-400 font-bold">Gagal memuat data.</div>`; }
         }
 
         function showDetail(item) {
             const modal = document.getElementById('modal-detail');
             const content = document.getElementById('modal-content');
             const footer = document.getElementById('modal-footer');
-            const userTim = localStorage.getItem('mitra_tim').toUpperCase();
-            
-            // Apakah user ini Pimpinan (BM, CRH, MRH, AM)?
-            const isPimpinan = userTim.includes("BM") || userTim.includes("CRH") || userTim.includes("MRH") || userTim.includes("AM");
+            const userTim = (localStorage.getItem('mitra_tim') || "").toUpperCase();
+            const isPimpinan = userTim.includes("BM") || userTim.includes("CRH") || userTim.includes("MRH") || userTim.includes("AM") || userTim.includes("ABM");
 
             content.innerHTML = `
                 <div class="space-y-4">
@@ -392,42 +250,30 @@
                         <div><p class="text-[10px] font-bold text-slate-400 uppercase">Nasabah</p><p class="font-bold">${item.nama}</p></div>
                         <div><p class="text-[10px] font-bold text-slate-400 uppercase">ID Pengajuan</p><p class="font-bold">${item.id}</p></div>
                     </div>
-                    <div><p class="text-[10px] font-bold text-slate-400 uppercase">Unit Kendaraan</p><p class="font-bold">${item.unit} (${item.tahun})</p></div>
+                    <div><p class="text-[10px] font-bold text-slate-400 uppercase">Unit Kendaraan</p><p class="font-bold">${item.unit}</p></div>
                     <div class="p-4 bg-orange-50 rounded-2xl border border-orange-100">
                         <p class="text-[10px] font-bold text-orange-600 uppercase mb-1">Status Saat Ini</p>
-                        <p class="font-black text-slate-800">${item.status}</p>
+                        <p class="font-black text-slate-800 text-lg uppercase">${item.status}</p>
                         <p class="text-xs text-slate-500 mt-1">${item.keterangan || "-"}</p>
                     </div>
-                    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
-                        <div><p class="text-[10px] font-bold text-slate-400 uppercase">Input Oleh</p><p class="font-bold text-xs">${item.mitra}</p></div>
-                        <div><p class="text-[10px] font-bold text-slate-400 uppercase">Bonus (Estimasi)</p><p class="font-bold text-green-600">Rp ${item.bonus.toLocaleString()}</p></div>
-                    </div>
-                    
                     ${isPimpinan ? `
-                    <div class="mt-6 pt-6 border-t-2 border-dashed border-slate-200 space-y-4">
-                        <p class="font-black text-sm text-slate-800 uppercase tracking-widest">Update Progress (Admin Only)</p>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Ubah Status</label>
-                            <select id="update-status" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm">
-                                <option value="PROSES" ${item.status === 'PROSES' ? 'selected' : ''}>PROSES</option>
-                                <option value="REVISI" ${item.status === 'REVISI' ? 'selected' : ''}>REVISI</option>
-                                <option value="REJECT" ${item.status === 'REJECT' ? 'selected' : ''}>REJECT</option>
-                                <option value="CANCEL" ${item.status === 'CANCEL' ? 'selected' : ''}>CANCEL</option>
-                                <option value="GOLIVE" ${item.status === 'GOLIVE' ? 'selected' : ''}>GOLIVE</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Keterangan / Catatan</label>
-                            <textarea id="update-ket" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm" rows="3" placeholder="Masukkan alasan reject, detail revisi, atau info lainnya...">${item.keterangan || ""}</textarea>
-                        </div>
+                    <div class="mt-4 pt-6 border-t-2 border-dashed border-slate-200 space-y-4">
+                        <p class="font-black text-sm text-slate-800 uppercase tracking-widest">Update Progres (Admin)</p>
+                        <select id="update-status" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm">
+                            <option value="PROSES" ${item.status === 'PROSES' ? 'selected' : ''}>PROSES</option>
+                            <option value="REVISI" ${item.status === 'REVISI' ? 'selected' : ''}>REVISI</option>
+                            <option value="REJECT" ${item.status === 'REJECT' ? 'selected' : ''}>REJECT</option>
+                            <option value="CANCEL" ${item.status === 'CANCEL' ? 'selected' : ''}>CANCEL</option>
+                            <option value="GOLIVE" ${item.status === 'GOLIVE' ? 'selected' : ''}>GOLIVE</option>
+                        </select>
+                        <textarea id="update-ket" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm" rows="3" placeholder="Alasan reject/detail revisi...">${item.keterangan || ""}</textarea>
                     </div>` : ''}
-                </div>
-            `;
+                </div>`;
 
             footer.innerHTML = isPimpinan ? `
-                <button onclick="closeModal()" class="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-all">BATAL</button>
-                <button onclick="saveStatusUpdate('${item.id}')" id="btn-save-status" class="flex-[2] py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg active:scale-[0.98] transition-all">SIMPAN PERUBAHAN</button>
-            ` : `<button onclick="closeModal()" class="w-full py-4 font-bold bg-slate-100 rounded-xl">TUTUP</button>`;
+                <button onclick="closeModal()" class="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-all uppercase">BATAL</button>
+                <button onclick="saveStatusUpdate('${item.id}')" id="btn-save-status" class="flex-[2] py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg active:scale-95 transition-all uppercase">SIMPAN</button>` 
+                : `<button onclick="closeModal()" class="w-full py-4 font-bold bg-slate-100 rounded-xl uppercase">TUTUP</button>`;
 
             modal.style.display = 'flex';
             lucide.createIcons();
@@ -435,131 +281,76 @@
 
         async function saveStatusUpdate(id) {
             const btn = document.getElementById('btn-save-status');
-            const status = document.getElementById('update-status').value;
-            const ket = document.getElementById('update-ket').value;
-
-            btn.disabled = true;
-            btn.innerText = "MENYIMPAN...";
-
+            btn.disabled = true; btn.innerText = "MENYIMPAN...";
             try {
                 const res = await fetch(WEB_APP_URL, {
                     method: 'POST',
                     body: JSON.stringify({
                         action: 'updateStatusAdmin',
                         id: id,
-                        status: status,
-                        keterangan: ket
+                        status: document.getElementById('update-status').value,
+                        keterangan: document.getElementById('update-ket').value
                     })
                 });
                 const result = await res.json();
-                if (result.result === "success") {
-                    alert("Status berhasil diperbarui!");
-                    closeModal();
-                    fetchStatus();
-                } else {
-                    alert("Gagal: " + result.message);
-                }
-            } catch (e) {
-                alert("Terjadi kesalahan koneksi.");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "SIMPAN PERUBAHAN";
-            }
+                if (result.result === "success") { alert("Status berhasil diperbarui!"); closeModal(); fetchStatus(); }
+            } catch (e) { alert("Terjadi kesalahan koneksi."); }
+            finally { btn.disabled = false; btn.innerText = "SIMPAN"; }
         }
 
-        function closeModal() {
-            document.getElementById('modal-detail').style.display = 'none';
-        }
-
-        async function uploadFile(fileInput, prefix, nama) {
-            const file = fileInput.files[0];
-            if (!file) return "-";
-            
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    const base64 = e.target.result;
-                    try {
-                        const res = await fetch(WEB_APP_URL, {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                action: 'uploadOnly',
-                                fileData: base64,
-                                prefix: prefix,
-                                nama: nama
-                            })
-                        });
-                        const data = await res.json();
-                        resolve(data.url || "-");
-                    } catch (err) { resolve("-"); }
-                };
-                reader.readAsDataURL(file);
-            });
-        }
+        function closeModal() { document.getElementById('modal-detail').style.display = 'none'; }
 
         async function submitPengajuan() {
             const btn = document.getElementById('btn-submit');
-            const mitra = localStorage.getItem('mitra_name');
-            const tim = localStorage.getItem('mitra_tim');
-            const nama = document.getElementById('inp-nama').value;
-            const nik = document.getElementById('inp-nik').value;
-            const hp = document.getElementById('inp-hp').value;
+            const nNasabah = document.getElementById('debitur-name').value;
+            if (!nNasabah) return alert("Mohon isi nama nasabah!");
 
-            if (!nama || !nik || !hp) return alert("Mohon lengkapi Nama, NIK, dan Nomor HP!");
-
-            btn.disabled = true;
-            btn.innerText = "SEDANG MENGUPLOAD BERKAS...";
-
-            const urlKtp = await uploadFile(document.getElementById('inp-ktp'), "KTP", nama);
-            const urlStnk = await uploadFile(document.getElementById('inp-stnk'), "STNK", nama);
-            const urlPajak = await uploadFile(document.getElementById('inp-pajak'), "PAJAK", nama);
-
-            btn.innerText = "MENYIMPAN DATA...";
-
+            btn.disabled = true; btn.innerText = "MENGIRIM...";
             const payload = {
                 action: "submitPengajuan",
-                mitra: mitra, tim: tim, nama: nama, nik: nik, hp: hp,
-                jenis: document.getElementById('inp-jenis').value,
-                tahun: document.getElementById('inp-tahun').value,
-                cabangSurvey: document.getElementById('inp-cabang').value,
-                detail: document.getElementById('inp-detail').value,
-                fileKtp: urlKtp, fileStnk: urlStnk, filePajak: urlPajak
+                mitra: localStorage.getItem('mitra_name'),
+                tim: localStorage.getItem('mitra_tim'),
+                nama: nNasabah,
+                hp: document.getElementById('debitur-hp').value,
+                jenis: document.getElementById('vehicle-type').value,
+                tahun: document.getElementById('vehicle-year').value,
+                detail: document.getElementById('vehicle-model').value
             };
 
             try {
                 const res = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
-                const data = await res.json();
-                if (data.result === "success") {
-                    alert("Pengajuan Berhasil Dikirim! ID: " + data.id);
-                    location.reload();
-                } else { alert("Gagal: " + data.error); }
-            } catch (e) { alert("Error: " + e.toString()); }
-            finally { btn.disabled = false; btn.innerText = "KIRIM PENGAJUAN SEKARANG"; }
+                const result = await res.json();
+                if (result.result === "success") { 
+                    alert("Berhasil! ID: " + result.id); 
+                    document.getElementById('debitur-name').value = "";
+                    document.getElementById('debitur-hp').value = "";
+                    document.getElementById('vehicle-model').value = "";
+                    switchTab('status'); 
+                }
+            } catch (e) { alert("Gagal kirim data pengajuan"); }
+            finally { btn.disabled = false; btn.innerText = "SIMPAN PENGAJUAN SEKARANG"; }
         }
 
         function submitToWhatsApp() {
-            const plafon = document.getElementById('amount-input').value;
+            const n = document.getElementById('debitur-name').value;
+            const u = document.getElementById('vehicle-model').value;
+            const t = document.getElementById('vehicle-year').value;
             const tim = localStorage.getItem('mitra_tim');
-            const mitra = localStorage.getItem('mitra_name');
             const pimpinan = { "Jayapura-MRH1": "6281343269253", "Jayapura-MRH2": "6281247940024" };
             const wa = pimpinan[tim] || "6281315574375";
-            
-            const msg = `*SIMULASI PENGAJUAN BARU*%0A---------------------------%0AAgen: ${mitra}%0ATim: ${tim}%0APlafon: Rp ${parseInt(plafon).toLocaleString()}%0ATenor: ${selectedTenor} Bulan%0A---------------------------`;
-            window.open(`https://api.whatsapp.com/send?phone=${wa}&text=${msg}`);
+            const msg = `*SIMULASI PENGAJUAN*\nNama: ${n}\nUnit: ${u} ${t}\nPlafon: ${document.getElementById('amount-input').value}\nTenor: ${selectedTenor} Bulan`;
+            window.open(`https://api.whatsapp.com/send?phone=${wa}&text=${encodeURIComponent(msg)}`);
         }
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = "index.html";
-        }
+        function logout() { localStorage.clear(); window.location.href = "index.html"; }
 
         window.onload = () => {
             lucide.createIcons();
             updateTenorOptions();
             const n = localStorage.getItem('mitra_name');
             const t = localStorage.getItem('mitra_tim');
-            if (!n) return window.location.href = "index.html";
-            document.getElementById('welcome-text').innerText = `Halo, ${n}`;
+            if (n) document.getElementById('welcome-text').innerText = `Halo, ${n} (${t}) - Partner Portal`;
+            else window.location.href = "index.html";
             document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
         }
     </script>
