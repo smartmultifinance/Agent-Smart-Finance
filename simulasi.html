@@ -183,7 +183,7 @@
                         <p id="sum-reject" class="text-lg font-black text-red-600">0</p>
                     </div>
                     <div class="bg-white p-3 rounded-2xl shadow-sm border-l-4 border-gray-400">
-                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Loss</p>
+                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Cancel</p>
                         <p id="sum-loss" class="text-lg font-black text-gray-600">0</p>
                     </div>
                 </div>
@@ -225,7 +225,6 @@
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwNAb9m2rPUR8kX7RCXbFFVvCvvHq9Orb1HGsPVrbSR-TJfu6kCR8IWD-0RADi75fSy/exec";
         let selectedTenor = 12;
 
-        // Label update for file inputs
         document.getElementById('inp-ktp').onchange = e => document.getElementById('label-ktp').innerText = e.target.files[0].name.substring(0,12);
         document.getElementById('inp-stnk').onchange = e => document.getElementById('label-stnk').innerText = e.target.files[0].name.substring(0,12);
         document.getElementById('inp-pajak').onchange = e => document.getElementById('label-pajak').innerText = e.target.files[0].name.substring(0,12);
@@ -260,7 +259,7 @@
                 const data = await response.json();
                 document.getElementById('sum-golive').innerText = data.golive || 0;
                 document.getElementById('sum-reject').innerText = data.reject || 0;
-                document.getElementById('sum-loss').innerText = data.loss || 0;
+                document.getElementById('sum-loss').innerText = data.cancel || 0; 
                 document.getElementById('sum-total').innerText = (data.total || 0) + " Pengajuan";
             } catch (err) { console.error(err); }
         }
@@ -284,12 +283,24 @@
                         const bonusVal = parseInt(item.bonus) || 0;
                         if(s === "GOLIVE") totalBonusGolive += bonusVal;
 
-                        // SLA Step Calculation
+                        // --- LOGIKA SLA PENYEMPURNAAN ---
                         const tglUpdate = new Date(item.tanggalUpdate || item.tanggalInput);
                         const diffMs = Math.abs(new Date() - tglUpdate);
-                        const d = Math.floor(diffMs / 86400000);
-                        const h = Math.floor((diffMs % 86400000) / 3600000);
-                        const slaText = d > 0 ? `${d}d ${h}h` : `${h} Jam`;
+                        
+                        const totalMinutes = Math.floor(diffMs / 60000);
+                        const totalHours = Math.floor(totalMinutes / 60);
+                        const d = Math.floor(totalHours / 24);
+                        const h = totalHours % 24;
+                        const m = totalMinutes % 60;
+
+                        let slaText = "";
+                        if (d > 0) {
+                            slaText = `${d} Hari, ${h} Jam`;
+                        } else if (h > 0) {
+                            slaText = `${h} Jam, ${m} Menit`;
+                        } else {
+                            slaText = `${m} Menit`;
+                        }
 
                         const steps = ["PROSES", "SURVEY", "KOMITE", "APPROVE", "GOLIVE"];
                         const isFailed = (s === "REJECT" || s === "CANCEL");
@@ -303,7 +314,7 @@
                             
                             stepperHtml += `
                                 <div class="flex flex-col items-center flex-1 relative">
-                                    <div class="absolute -top-3.5 text-[5px] font-bold text-orange-500 whitespace-nowrap">
+                                    <div class="absolute -top-3.5 text-[5px] font-bold text-orange-500 whitespace-nowrap italic">
                                         ${isActiveStep && !isFailed && s !== "GOLIVE" ? slaText : ""}
                                     </div>
                                     <div class="w-4 h-4 rounded-full z-10 flex items-center justify-center text-[7px] font-bold 
@@ -331,10 +342,10 @@
                             <div class="flex justify-between items-end text-[9px]">
                                 <div class="flex-1">
                                     <p class="text-slate-500 italic">Ket: ${item.keterangan || '-'}</p>
-                                    <p class="text-[8px] text-slate-300 font-bold mt-1 uppercase">SLA: ${slaText} aktif</p>
+                                    <p class="text-[8px] text-slate-300 font-bold mt-1 uppercase tracking-tighter">Durasi Tahap: ${slaText}</p>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-slate-400 uppercase font-bold text-[7px]">Bonus</p>
+                                    <p class="text-slate-400 uppercase font-bold text-[7px]">Bonus Cair</p>
                                     <p class="text-sm font-black text-emerald-600">Rp ${bonusVal.toLocaleString('id-ID')}</p>
                                 </div>
                             </div>
@@ -346,7 +357,6 @@
             } catch (e) { container.innerHTML = `<p class="text-center text-xs text-red-400 py-10">Koneksi Error.</p>`; }
         }
 
-        // SIMULASI FUNCTIONS
         function formatNumber(n) { return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
         function cleanNumber(s) { return parseInt(s.replace(/\./g, "")) || 0; }
         
