@@ -290,8 +290,8 @@
             }
 
             try {
-                // Sesuai script .gs: getSummary membutuhkan parameter mitra, bulan, tahun
-                const response = await fetch(`${WEB_APP_URL}?action=getSummary&mitra=${encodeURIComponent(mitraName)}&bulan=${skr.getMonth() + 1}&tahun=${tahunSekarang}`);
+                // Request disesuaikan dengan Apps Script yang baru menggunakan action=getSummary
+                const response = await fetch(`${WEB_APP_URL}?action=getSummary&mitra=${encodeURIComponent(mitraName)}`);
                 const data = await response.json();
                 document.getElementById('sum-golive').innerText = data.golive || 0;
                 document.getElementById('sum-reject').innerText = data.reject || 0;
@@ -329,7 +329,7 @@
                 hp: hp,
                 jenis: document.getElementById('inp-jenis').value,
                 tahun: document.getElementById('inp-tahun').value,
-                cabangSurvey: cabang,
+                cabangSurvey: cabang, // Key ini disamakan dengan Apps Script
                 detail: document.getElementById('inp-detail').value,
                 fileKtp: await toBase64(document.getElementById('inp-ktp').files[0]),
                 fileStnk: await toBase64(document.getElementById('inp-stnk').files[0]),
@@ -365,7 +365,7 @@
             loadSummaryData(); 
 
             try {
-                const resp = await fetch(`${WEB_APP_URL}?action=getStatus&tim=${tim}&t=${new Date().getTime()}`);
+                const resp = await fetch(`${WEB_APP_URL}?action=getStatus&tim=${encodeURIComponent(tim)}&t=${new Date().getTime()}`);
                 const data = await resp.json();
                 
                 if(!data || data.length === 0) {
@@ -377,14 +377,11 @@
                 let totalBonusGolive = 0;
                 let listHtml = "";
 
-                // Reverse agar data terbaru di atas
                 data.reverse().forEach(item => {
                     const statusText = String(item.status || "").trim().toUpperCase();
                     const mitraItem = String(item.mitra || "").trim().toLowerCase();
-                    const bonusStr = String(item.bonus || "0").replace(/\D/g, "");
-                    const bonusVal = parseInt(bonusStr) || 0;
+                    const bonusVal = parseInt(item.bonus) || 0;
 
-                    // Filter hanya data milik mitra yang sedang login
                     if(mitraItem === mitraLogin) {
                         if(statusText === "GOLIVE") {
                             totalBonusGolive += bonusVal;
@@ -393,7 +390,7 @@
                         let sColor = "bg-orange-50 text-orange-600";
                         if(statusText === "GOLIVE") sColor = "bg-green-50 text-green-600";
                         if(statusText === "REJECT") sColor = "bg-red-50 text-red-600";
-                        if(statusText === "CANCEL" || statusText === "LOSS DEAL") sColor = "bg-gray-100 text-gray-500";
+                        if(statusText === "CANCEL" || statusText === "LOSS DEAL" || statusText === "LOSS") sColor = "bg-gray-100 text-gray-500";
 
                         listHtml += `
                         <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-4">
