@@ -203,6 +203,36 @@
         </main>
     </div>
 
+    <div id="update-modal" class="modal-overlay">
+        <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl">
+            <h3 class="text-xl font-extrabold text-slate-800 mb-4">Update Status</h3>
+            <input type="hidden" id="update-id">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Status Baru</label>
+                    <select id="update-status-val" class="w-full p-4 bg-slate-50 border rounded-xl font-bold outline-none">
+                        <option value="PROSES">PROSES</option>
+                        <option value="SURVEY">SURVEY</option>
+                        <option value="KOMITE">KOMITE</option>
+                        <option value="APPROVE">APPROVE</option>
+                        <option value="GOLIVE">GOLIVE</option>
+                        <option value="REJECT">REJECT</option>
+                        <option value="CANCEL">CANCEL</option>
+                        <option value="REVISI">REVISI</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Keterangan / Catatan</label>
+                    <textarea id="update-note" rows="3" class="w-full p-4 bg-slate-50 border rounded-xl outline-none text-sm" placeholder="Catatan perkembangan..."></textarea>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="closeUpdateModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl">BATAL</button>
+                    <button id="btn-save-update" onclick="saveStatusUpdate()" class="flex-[2] py-4 bg-orange-600 text-white font-bold rounded-2xl shadow-lg">SIMPAN PERUBAHAN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="lead-modal" class="modal-overlay">
         <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
             <div class="flex justify-between items-center mb-6">
@@ -222,7 +252,7 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyfZsgb_3MM5Kr4vVvMXXjBsDfasLVwwMGI12YthQSlarwnkKWFHRNlc8jrFrlFxsU/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz87oJalQWtwvZOG1rXjalINGFZr7jfZiiUQuNmFmRV6cajKky6aBPw9Pf7i8dyMTpK/exec";
         let selectedTenor = 12;
 
         document.getElementById('inp-ktp').onchange = e => document.getElementById('label-ktp').innerText = e.target.files[0].name.substring(0,12);
@@ -255,9 +285,6 @@
         async function loadSummaryData() {
             const mitraName = localStorage.getItem('mitra_name');
             const tim = localStorage.getItem('mitra_tim');
-            const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-            const skr = new Date();
-            document.getElementById('current-month-label').innerText = `${bulanIndo[skr.getMonth()]} ${skr.getFullYear()}`;
             try {
                 const response = await fetch(`${WEB_APP_URL}?action=getSummary&mitra=${encodeURIComponent(mitraName)}&tim=${encodeURIComponent(tim)}`);
                 const data = await response.json();
@@ -270,10 +297,13 @@
 
         async function fetchStatusData() {
             const container = document.getElementById('status-list-container');
-            const tim = localStorage.getItem('mitra_tim');
+            const tim = (localStorage.getItem('mitra_tim') || "").toUpperCase();
             const mitraLogin = (localStorage.getItem('mitra_name') || "").trim();
             loadSummaryData();
             container.innerHTML = `<p class="text-center text-xs text-slate-400 py-10">Memuat data...</p>`;
+
+            // Update Logika SPV: BM, CRH, MRH, AM, ABM
+            const isPimpinan = tim.includes("BM") || tim.includes("CRH") || tim.includes("MRH") || tim.includes("AM");
 
             try {
                 const resp = await fetch(`${WEB_APP_URL}?action=getStatus&tim=${encodeURIComponent(tim)}&nama=${encodeURIComponent(mitraLogin)}`);
@@ -321,6 +351,11 @@
 
                     let sColor = s === "GOLIVE" ? "bg-green-50 text-green-600" : (isFailed ? "bg-red-50 text-red-600" : (s === "REVISI" ? "bg-red-100 text-red-700 font-black border border-red-200" : "bg-orange-50 text-orange-600"));
 
+                    let updateBtnHtml = "";
+                    if (isPimpinan) {
+                        updateBtnHtml = `<button onclick="openUpdateModal('${item.id}', '${s}', '${item.keterangan || ''}')" class="mt-2 w-full py-2 bg-slate-900 text-white text-[10px] font-bold rounded-xl shadow-md flex items-center justify-center gap-2 italic tracking-widest"><i data-lucide="edit-3" class="w-3 h-3"></i> UPDATE STATUS</button>`;
+                    }
+
                     listHtml += `
                     <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-3">
                         <div class="flex justify-between items-start border-b border-slate-50 pb-2">
@@ -341,11 +376,45 @@
                                 <p class="text-sm font-black text-emerald-600">Rp ${bonusVal.toLocaleString('id-ID')}</p>
                             </div>
                         </div>
+                        ${updateBtnHtml}
                     </div>`;
                 });
                 container.innerHTML = listHtml || `<p class="text-center text-xs text-slate-400 py-10">Belum ada pengajuan.</p>`;
                 document.getElementById('total-bonus-cair').innerText = "Rp " + totalBonusGolive.toLocaleString('id-ID');
+                lucide.createIcons();
             } catch (e) { container.innerHTML = `<p class="text-center text-xs text-red-400 py-10">Koneksi Error.</p>`; }
+        }
+
+        function openUpdateModal(id, currentStatus, currentNote) {
+            document.getElementById('update-id').value = id;
+            document.getElementById('update-status-val').value = currentStatus;
+            document.getElementById('update-note').value = currentNote;
+            document.getElementById('update-modal').classList.add('active');
+        }
+
+        function closeUpdateModal() { document.getElementById('update-modal').classList.remove('active'); }
+
+        async function saveStatusUpdate() {
+            const btn = document.getElementById('btn-save-update');
+            const payload = {
+                action: "updateStatusAdmin",
+                id: document.getElementById('update-id').value,
+                status: document.getElementById('update-status-val').value,
+                keterangan: document.getElementById('update-note').value,
+                admin: localStorage.getItem('mitra_name')
+            };
+            btn.disabled = true; btn.innerText = "MENYIMPAN...";
+            try {
+                const resp = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const res = await resp.json();
+                if(res.result === "success") {
+                    alert("Status Berhasil Diupdate!");
+                    closeUpdateModal();
+                    fetchStatusData();
+                }
+            } catch(e) { alert("Gagal update status."); } finally { 
+                btn.disabled = false; btn.innerText = "SIMPAN PERUBAHAN"; 
+            }
         }
 
         function formatNumber(n) { return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
@@ -446,10 +515,12 @@
             lucide.createIcons();
             updateTenorOptions();
             const n = localStorage.getItem('mitra_name');
-            if (n) document.getElementById('welcome-text').innerText = `Halo, ${n} - Partner Portal`;
+            const t = localStorage.getItem('mitra_tim');
+            if (n) document.getElementById('welcome-text').innerText = `Halo, ${n} (${t}) - Partner Portal`;
+            const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const skr = new Date();
+            document.getElementById('current-month-label').innerText = `${bulanIndo[skr.getMonth()]} ${skr.getFullYear()}`;
         };
     </script>
 </body>
 </html>
-
-
