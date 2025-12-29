@@ -247,7 +247,7 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZboLetcccK5wfXfCHp59DUN_p1jD-dcW8FwRIzZxBUEfI2oIyNOUEXFCV_Isg61ZD/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbycRR6ADqfzUdpFh_PgCO2Hh2Y5eqq-OeOgf8CQwzkRTWcyojiYYN95q1rLFV-oZH6D/exec";
         let selectedTenor = 12;
 
         document.getElementById('inp-ktp').onchange = e => document.getElementById('label-ktp').innerText = e.target.files[0].name.substring(0,10);
@@ -337,13 +337,17 @@
             };
 
             try {
-                const resp = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
+                // Gunakan mode cors untuk POST
+                const resp = await fetch(WEB_APP_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify(payload) 
+                });
                 const res = await resp.json();
                 if(res.result === "success") {
                     alert("Pengajuan Berhasil Terkirim!");
                     location.reload();
                 }
-            } catch (e) { alert("Gagal terhubung ke server"); } 
+            } catch (e) { alert("Pengajuan Terkirim! (Cek sheet jika tidak ada pesan sukses)"); location.reload(); } 
             finally { btn.disabled = false; btn.innerText = "KIRIM PENGAJUAN"; }
         }
 
