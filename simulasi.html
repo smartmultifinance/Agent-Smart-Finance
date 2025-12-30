@@ -7,6 +7,7 @@
 		
 		<script src="https://cdn.tailwindcss.com/"></script>
 		<script src="https://unpkg.com/lucide@latest"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		
 		<style>
 			@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -32,13 +33,16 @@
 			input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 				-webkit-appearance: none; margin: 0;
             }
+            /* Custom SweetAlert Style agar senada dengan orange */
+            .swal2-popup { border-radius: 2rem !important; font-family: 'Plus Jakarta Sans', sans-serif !important; }
+            .swal2-styled.swal2-confirm { background-color: #ea580c !important; border-radius: 1rem !important; }
 		</style>
 	</head>
 	<body class="min-h-screen pb-10">
 
 		<div class="w-full max-w-lg mx-auto bg-white min-h-screen shadow-2xl overflow-hidden flex flex-col">
 			<header class="bg-orange-600 p-8 text-white relative">
-				<button onclick="handleLogout()" class="absolute top-8 right-6 p-2 bg-orange-500 hover:bg-orange-700 rounded-xl transition-all shadow-lg border border-orange-400">
+				<button onclick="confirmLogout()" class="absolute top-8 right-6 p-2 bg-orange-500 hover:bg-orange-700 rounded-xl transition-all shadow-lg border border-orange-400">
 					<i data-lucide="log-out" class="w-4 h-4"></i>
 				</button>
 				
@@ -234,11 +238,23 @@
 			document.getElementById('inp-stnk').onchange = e => document.getElementById('label-stnk').innerText = e.target.files[0].name.substring(0,12);
             document.getElementById('inp-pajak').onchange = e => document.getElementById('label-pajak').innerText = e.target.files[0].name.substring(0,12);
 
-			function handleLogout() {
-				if(confirm("Logout dari aplikasi?")) { 
-                    localStorage.clear(); // Hapus data login
-                    window.location.href = "index.html"; 
-                }
+            // FIX POPUP LOGOUT MODERN
+			function confirmLogout() {
+                Swal.fire({
+                    title: 'Logout Sekarang?',
+                    text: "Sesi Anda akan diakhiri dan harus login kembali.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Keluar',
+                    cancelButtonText: 'Tidak',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.clear();
+                        sessionStorage.clear();
+                        window.location.href = "index.html";
+                    }
+                });
 			}
 
 			function switchTab(tab) {
@@ -257,15 +273,10 @@
 				window.scrollTo(0,0);
 			}
 
-            // FIX: PLACEHOLDER DINAMIS
             function updatePlaceholderDetail() {
                 const jenis = document.getElementById('inp-jenis').value;
                 const detailInput = document.getElementById('inp-detail');
-                if(jenis === "Motor") {
-                    detailInput.placeholder = "Contoh: Honda Vario 150 CBS ISS";
-                } else {
-                    detailInput.placeholder = "Contoh: Toyota Avanza G 1.3CC Manual";
-                }
+                detailInput.placeholder = (jenis === "Motor") ? "Contoh: Honda Vario 150 CBS ISS" : "Contoh: Toyota Avanza G 1.3CC Manual";
             }
 
 			async function loadSummaryData() {
@@ -300,8 +311,9 @@
 							const bonusVal = parseInt(item.bonus) || 0;
 							if(s === "GOLIVE") totalBonusGolive += bonusVal;
 
-							const tglUpdate = new Date(item.tanggalUpdate || item.tanggalInput);
-							const diffMs = Math.abs(new Date() - tglUpdate);
+							const tglMulai = new Date(item.tanggalInput);
+							const tglAkhir = (s === "GOLIVE" || s === "REJECT" || s === "CANCEL") ? new Date(item.tanggalUpdate) : new Date();
+							const diffMs = Math.abs(tglAkhir - tglMulai);
 							
 							const totalMinutes = Math.floor(diffMs / 60000);
 							const totalHours = Math.floor(totalMinutes / 60);
@@ -309,14 +321,7 @@
 							const h = totalHours % 24;
 							const m = totalMinutes % 60;
 
-							let slaText = "";
-							if (d > 0) {
-								slaText = `${d} Hari, ${h} Jam`;
-							} else if (h > 0) {
-								slaText = `${h} Jam, ${m} Menit`;
-							} else {
-								slaText = `${m} Menit`;
-							}
+							let slaText = d > 0 ? `${d} Hari, ${h} Jam` : (h > 0 ? `${h} Jam, ${m} Menit` : `${m} Menit`);
 
 							const steps = ["PROSES", "SURVEY", "KOMITE", "APPROVE", "GOLIVE"];
 							const isFailed = (s === "REJECT" || s === "CANCEL");
@@ -359,7 +364,9 @@
 								<div class="flex justify-between items-end text-[9px]">
 									<div class="flex-1">
 										<p class="text-slate-500 italic">Ket: ${item.keterangan || '-'}</p>
-										<p class="text-[8px] text-slate-300 font-bold mt-1 uppercase tracking-tighter">Durasi Tahap: ${slaText}</p>
+										<p class="text-[8px] text-slate-400 font-bold mt-1 uppercase tracking-tighter">
+                                            ${(s === "GOLIVE" || isFailed) ? 'Total Waktu Proses: ' + slaText : 'Durasi Tahap: ' + slaText}
+                                        </p>
 									</div>
 									<div class="text-right">
 										<p class="text-slate-400 uppercase font-bold text-[7px]">Bonus Cair</p>
@@ -430,10 +437,14 @@
 				return json.url || "-";
 			}
 
+            // FIX NOTIFIKASI MODERN SETELAH KIRIM DATA
 			async function submitAplikasiBaru() {
 				const btn = document.getElementById('btn-submit-pengajuan');
 				const nama = document.getElementById('inp-nama').value;
-                if(!nama || !document.getElementById('inp-hp').value) { alert("Nama & HP wajib diisi!"); return; }
+                if(!nama || !document.getElementById('inp-hp').value) { 
+                    Swal.fire('Oops!', 'Nama & HP wajib diisi!', 'error');
+                    return; 
+                }
 				btn.disabled = true; btn.innerText = "SEDANG MENGUPLOAD...";
                 try {
 					const lktp = await uploadFileSingle('inp-ktp', 'KTP', nama);
@@ -454,10 +465,21 @@
 					};
                     const resp = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
 					const res = await resp.json();
-                    // FIX: NOTIFIKASI BERHASIL TANPA LINK
-                    if(res.result === "success") { alert("Data Berhasil dikirim"); switchTab('status'); }
-				} catch(e) { alert("Gagal kirim."); } finally { btn.disabled = false;
-                btn.innerText = "KIRIM PENGAJUAN"; }
+                    if(res.result === "success") { 
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Data Berhasil dikirim',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                        switchTab('status'); 
+                    }
+				} catch(e) { 
+                    Swal.fire('Error', 'Gagal kirim data.', 'error');
+                } finally { 
+                    btn.disabled = false;
+                    btn.innerText = "KIRIM PENGAJUAN"; 
+                }
 			}
 
 			function submitToWhatsApp() {
