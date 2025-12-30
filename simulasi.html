@@ -34,24 +34,22 @@
 				-webkit-appearance: none; margin: 0;
             }
 
-            /* SweetAlert Modern Custom Design */
+            /* SweetAlert Modern & Clean */
             .swal2-popup { 
                 border-radius: 2.5rem !important; 
-                padding: 2rem !important;
+                padding: 2.2rem !important;
                 font-family: 'Plus Jakarta Sans', sans-serif !important;
-                box-shadow: 0 25px 50px -12px rgba(234, 88, 12, 0.2) !important;
             }
-            .swal2-title { font-weight: 800 !important; color: #1e293b !important; font-size: 1.5rem !important; }
+            .swal2-title { font-weight: 800 !important; color: #1e293b !important; }
             .swal2-styled.swal2-confirm { 
                 background-color: #ea580c !important; 
                 border-radius: 1.2rem !important; 
-                padding: 0.8rem 2.5rem !important;
+                padding: 0.8rem 2.2rem !important;
                 font-weight: 700 !important;
-                box-shadow: 0 10px 15px -3px rgba(234, 88, 12, 0.3) !important;
             }
             .swal2-styled.swal2-cancel { 
                 border-radius: 1.2rem !important; 
-                padding: 0.8rem 2.5rem !important;
+                padding: 0.8rem 2.2rem !important;
                 font-weight: 700 !important;
             }
 		</style>
@@ -311,7 +309,6 @@
                 } catch (err) { console.error(err); }
 			}
 
-            // FUNGSI HELPER HITUNG DURASI
             function calculateDuration(start, end) {
                 const diffMs = Math.abs(new Date(end) - new Date(start));
                 const totalMinutes = Math.floor(diffMs / 60000);
@@ -341,7 +338,6 @@
 							const bonusVal = parseInt(item.bonus) || 0;
 							if(s === "GOLIVE") totalBonusGolive += bonusVal;
 
-                            // WAKTU TOTAL
 							const tglMulai = item.tanggalInput;
 							const tglUpdate = item.tanggalUpdate;
                             const tglSekarang = new Date();
@@ -356,7 +352,6 @@
 							let stepperHtml = `<div class="flex items-center justify-between px-1 py-4 bg-slate-50 rounded-2xl my-3">`;
                             steps.forEach((stepName, idx) => {
 								const isDone = !isFailed && idx <= currentStepIdx;
-								const isActiveStep = (idx === currentStepIdx);
 								const isFailPoint = isFailed && idx === currentStepIdx;
 								
 								stepperHtml += `
@@ -373,11 +368,7 @@
                                                     <span class="absolute -top-3 left-1/2 -translate-x-1/2 text-[5px] font-black text-orange-600 bg-white px-1.5 border border-orange-100 rounded-full shadow-sm">
                                                         ${calculateDuration(tglMulai, tglUpdate)}
                                                     </span>
-                                                ` : (isActiveStep && !isFinal ? `
-                                                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 text-[5px] font-black text-slate-400 bg-white px-1.5 border border-slate-100 rounded-full italic animate-pulse">
-                                                        PROSES...
-                                                    </span>
-                                                ` : '')}
+                                                ` : ''}
                                             </div>` : ''}
 									</div>`;
 							});
@@ -533,9 +524,9 @@
                 const n = localStorage.getItem('mitra_name');
 				if (n) {
                     document.getElementById('welcome-text').innerText = `Halo, ${n} - Partner Portal`;
-                    // BERSIHKAN SEMUA DATA NOTIFIKASI SISA LOGIN/REGISTRASI
+                    // HAPUS SEMUA DATA NOTIFIKASI REGISTRASI LAMA AGAR TIDAK MUNCUL SAAT LOGIN
                     localStorage.removeItem('pendaftaran_sukses');
-                    sessionStorage.removeItem('reg_status');
+                    sessionStorage.clear(); // Bersihkan sisa sesi pendaftaran
                 }
 			};
 		</script>
