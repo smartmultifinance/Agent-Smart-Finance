@@ -294,8 +294,6 @@
             const container = document.getElementById('status-list-container');
             const tim = localStorage.getItem('mitra_tim') || "";
             const mitraLogin = (localStorage.getItem('mitra_name') || "").trim().toLowerCase();
-            
-            // CEK OTORITAS MFH/CRH/MRH/BM/AM
             const isPimpinan = tim.includes("MFH") || tim.includes("CRH") || tim.includes("MRH") || tim.includes("BM") || tim.includes("AM");
 
             loadSummaryData();
@@ -375,7 +373,6 @@
             document.getElementById('update-id-hidden').value = id;
             document.getElementById('update-status-select').value = s;
             document.getElementById('admin-limit-info').innerText = `Update Terpakai: ${count} dari 2 Batas Maksimal`;
-            
             if(count >= 2) {
                 document.getElementById('btn-save-status').disabled = true;
                 document.getElementById('btn-save-status').innerText = "BATAS UPDATE HABIS";
@@ -394,7 +391,6 @@
             const status = document.getElementById('update-status-select').value;
             const ket = document.getElementById('update-keterangan-text').value;
             const btn = document.getElementById('btn-save-status');
-
             btn.disabled = true; btn.innerText = "MENYIMPAN...";
             try {
                 const resp = await fetch(WEB_APP_URL, {
