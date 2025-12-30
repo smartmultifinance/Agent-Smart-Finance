@@ -10,7 +10,7 @@
 		
 		<style>
 			@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-			body { 
+            body { 
 				font-family: 'Plus Jakarta Sans', sans-serif; 
 				background: #fff7ed;
 			}
@@ -20,18 +20,18 @@
 			}
 			.tenor-btn.active {
 				background-color: #c2410c;
-				color: white;
+                color: white;
 				border-color: #c2410c;
 			}
 			.modal-overlay {
 				background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px);
 				display: none; position: fixed; inset: 0; z-index: 50;
-				align-items: center; justify-content: center; padding: 1rem;
+                align-items: center; justify-content: center; padding: 1rem;
 			}
 			.modal-overlay.active { display: flex; }
 			input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 				-webkit-appearance: none; margin: 0;
-			}
+            }
 		</style>
 	</head>
 	<body class="min-h-screen pb-10">
@@ -86,8 +86,9 @@
 
 					<div class="px-2 py-1">
 						<p class="text-[11px] leading-relaxed text-slate-600 italic">
-							<span class="font-bold text-orange-600">PENTING :</span> Hitungan ini hanya simulasi, nilai angsuran dan pencairan bisa lebih tinggi atau lebih rendah berdasarkan hasil survey, data asset, dan data lainnya. Untuk informasi hitungan pasti, Silahkan Klik <span class="font-bold">CEK NILAI PENCAIRAN</span>.
-						</p>
+							<span class="font-bold text-orange-600">PENTING :</span> Hitungan ini hanya simulasi, nilai angsuran dan pencairan bisa lebih tinggi atau lebih rendah berdasarkan hasil survey, data asset, dan 
+                            data lainnya. Untuk informasi hitungan pasti, Silahkan Klik <span class="font-bold">CEK NILAI PENCAIRAN</span>.
+                        </p>
 					</div>
 
 					<button onclick="openLeadModal()" class="w-full bg-orange-600 text-white rounded-2xl py-5 font-bold shadow-xl">CEK NILAI PENCAIRAN</button>
@@ -142,7 +143,7 @@
 								<label class="text-[10px] font-bold text-slate-400 uppercase block mb-1.5 ml-1">Detail Kendaraan</label>
 								<textarea id="inp-detail" rows="2" placeholder="Contoh: Toyota Avanza G 1.3CC Manual" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-semibold text-slate-700 outline-none"></textarea>
 							</div>
-                            <div>
+                             <div>
 								<label class="text-[10px] font-bold text-orange-600 uppercase block mb-1.5 ml-1 italic">Nominal Pengajuan</label>
 								<input type="text" id="inp-plafon-pengajuan" placeholder="Contoh: 10.000.000" oninput="this.value = formatNumber(this.value)" class="w-full p-4 bg-orange-50 border border-orange-100 rounded-2xl font-bold text-orange-900 outline-none">
 							</div>
@@ -227,11 +228,11 @@
 
 		<script>
 			const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxN8c8cWVaP7dcgJ2-fT2HswIe3UfW2zhn9fKYJrUHVAwiLdsAgZkn1whz-U7iixfZm/exec";
-			let selectedTenor = 12;
+            let selectedTenor = 12;
 
 			document.getElementById('inp-ktp').onchange = e => document.getElementById('label-ktp').innerText = e.target.files[0].name.substring(0,12);
 			document.getElementById('inp-stnk').onchange = e => document.getElementById('label-stnk').innerText = e.target.files[0].name.substring(0,12);
-			document.getElementById('inp-pajak').onchange = e => document.getElementById('label-pajak').innerText = e.target.files[0].name.substring(0,12);
+            document.getElementById('inp-pajak').onchange = e => document.getElementById('label-pajak').innerText = e.target.files[0].name.substring(0,12);
 
 			function handleLogout() {
 				if(confirm("Logout dari aplikasi?")) { window.location.href = "index.html"; }
@@ -241,7 +242,7 @@
 				const sections = ['simulasi', 'pengajuan', 'status'];
 				const buttons = ['tab-simulasi', 'tab-pengajuan', 'tab-status'];
 				sections.forEach(s => document.getElementById(`section-${s}`).classList.add('hidden'));
-				buttons.forEach(b => {
+                buttons.forEach(b => {
 					document.getElementById(b).classList.remove('active', 'text-orange-600');
 					document.getElementById(b).classList.add('text-slate-400');
 				});
@@ -255,33 +256,31 @@
 
 			async function loadSummaryData() {
 				const mitraName = localStorage.getItem('mitra_name');
-				const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 				const skr = new Date();
-				document.getElementById('current-month-label').innerText = `${bulanIndo[skr.getMonth()]} ${skr.getFullYear()}`;
+                document.getElementById('current-month-label').innerText = `${bulanIndo[skr.getMonth()]} ${skr.getFullYear()}`;
 				try {
 					const response = await fetch(`${WEB_APP_URL}?action=getSummary&mitra=${encodeURIComponent(mitraName)}`);
 					const data = await response.json();
 					document.getElementById('sum-golive').innerText = data.golive || 0;
-					document.getElementById('sum-reject').innerText = data.reject || 0;
+                    document.getElementById('sum-reject').innerText = data.reject || 0;
 					document.getElementById('sum-loss').innerText = data.cancel || 0; 
 					document.getElementById('sum-total').innerText = (data.total || 0) + " Pengajuan";
-				} catch (err) { console.error(err); }
+                } catch (err) { console.error(err); }
 			}
 
 			async function fetchStatusData() {
 				const container = document.getElementById('status-list-container');
 				const tim = localStorage.getItem('mitra_tim');
-				const mitraLogin = (localStorage.getItem('mitra_name') || "").trim().toLowerCase();
+                const mitraLogin = (localStorage.getItem('mitra_name') || "").trim().toLowerCase();
 				loadSummaryData();
 				container.innerHTML = `<p class="text-center text-xs text-slate-400 py-10">Memuat data...</p>`;
-
-				try {
+                try {
 					const resp = await fetch(`${WEB_APP_URL}?action=getStatus&tim=${encodeURIComponent(tim)}`);
 					const data = await resp.json();
 					let totalBonusGolive = 0;
 					let listHtml = "";
-
-					data.reverse().forEach(item => {
+                    data.reverse().forEach(item => {
 						if(item.mitra.toLowerCase() === mitraLogin) {
 							const s = (item.status || "").toUpperCase();
 							const bonusVal = parseInt(item.bonus) || 0;
@@ -310,14 +309,14 @@
 							let currentStepIdx = steps.indexOf(s);
 
 							let stepperHtml = `<div class="flex items-center justify-between px-1 py-4 bg-slate-50 rounded-2xl my-3">`;
-							steps.forEach((stepName, idx) => {
+                            steps.forEach((stepName, idx) => {
 								const isDone = !isFailed && idx <= currentStepIdx;
 								const isActiveStep = (idx === currentStepIdx);
 								const isFailPoint = isFailed && idx === currentStepIdx;
 								
 								stepperHtml += `
 									<div class="flex flex-col items-center flex-1 relative">
-										<div class="absolute -top-3.5 text-[5px] font-bold text-orange-500 whitespace-nowrap italic">
+										<div class="absolute -top-4 text-[6px] font-bold text-orange-600 whitespace-nowrap italic tracking-tighter">
 											${isActiveStep && !isFailed && s !== "GOLIVE" ? slaText : ""}
 										</div>
 										<div class="w-4 h-4 rounded-full z-10 flex items-center justify-center text-[7px] font-bold 
@@ -356,9 +355,9 @@
 							</div>`;
 						}
 					});
-					container.innerHTML = listHtml || `<p class="text-center text-xs text-slate-400 py-10">Belum ada pengajuan.</p>`;
+                    container.innerHTML = listHtml || `<p class="text-center text-xs text-slate-400 py-10">Belum ada pengajuan.</p>`;
 					document.getElementById('total-bonus-cair').innerText = "Rp " + totalBonusGolive.toLocaleString('id-ID');
-				} catch (e) { container.innerHTML = `<p class="text-center text-xs text-red-400 py-10">Koneksi Error.</p>`; }
+                } catch (e) { container.innerHTML = `<p class="text-center text-xs text-red-400 py-10">Koneksi Error.</p>`; }
 			}
 
 			function formatNumber(n) { return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
@@ -367,9 +366,9 @@
 			function updateTenorOptions() {
 				const type = document.getElementById('main-vehicle-type').value;
 				const container = document.getElementById('tenor-container');
-				const tenors = type === "Motor" ? [6, 12, 18, 24] : [12, 24, 36, 48];
+                const tenors = type === "Motor" ? [6, 12, 18, 24] : [12, 24, 36, 48];
 				selectedTenor = tenors[1];
-				container.innerHTML = '';
+                container.innerHTML = '';
 				tenors.forEach(t => {
 					const btn = document.createElement('button');
 					btn.innerText = t;
@@ -381,7 +380,7 @@
 					};
 					container.appendChild(btn);
 				});
-				calculateSimulation();
+                calculateSimulation();
 			}
 
 			function handleAmountChange(input) {
@@ -392,17 +391,17 @@
 
 			function calculateSimulation() {
 				const amount = cleanNumber(document.getElementById('amount-input').value);
-				const type = document.getElementById('main-vehicle-type').value;
+                const type = document.getElementById('main-vehicle-type').value;
 				const rate = type === "Mobil" ? 0.009 : 0.015;
-				const monthly = Math.round((amount + (amount * rate * selectedTenor)) / selectedTenor);
+                const monthly = Math.round((amount + (amount * rate * selectedTenor)) / selectedTenor);
 				document.getElementById('monthly-installment').innerText = "Rp " + formatNumber(monthly.toString());
-			}
+            }
 
 			function openLeadModal() {
 				const amount = document.getElementById('amount-input').value;
 				const type = document.getElementById('main-vehicle-type').value;
 				const install = document.getElementById('monthly-installment').innerText;
-				document.getElementById('summary-info').innerHTML = `<p class="font-bold text-orange-900">${type} - Plafon Rp ${amount}</p><p class="text-orange-600 font-bold">${selectedTenor} Bln x ${install}</p>`;
+                document.getElementById('summary-info').innerHTML = `<p class="font-bold text-orange-900">${type} - Plafon Rp ${amount}</p><p class="text-orange-600 font-bold">${selectedTenor} Bln x ${install}</p>`;
 				document.getElementById('lead-modal').classList.add('active');
 				lucide.createIcons();
 			}
@@ -411,21 +410,21 @@
 			async function uploadFileSingle(id, prefix, nama) {
 				const f = document.getElementById(id).files[0];
 				if (!f) return "-";
-				const base64 = await new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(f); });
-				const resp = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: "uploadOnly", fileData: base64, prefix, nama }) });
-				const json = await resp.json();
+                const base64 = await new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(f); });
+                const resp = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: "uploadOnly", fileData: base64, prefix, nama }) });
+                const json = await resp.json();
 				return json.url || "-";
 			}
 
 			async function submitAplikasiBaru() {
 				const btn = document.getElementById('btn-submit-pengajuan');
 				const nama = document.getElementById('inp-nama').value;
-				if(!nama || !document.getElementById('inp-hp').value) { alert("Nama & HP wajib diisi!"); return; }
+                if(!nama || !document.getElementById('inp-hp').value) { alert("Nama & HP wajib diisi!"); return; }
 				btn.disabled = true; btn.innerText = "SEDANG MENGUPLOAD...";
-				try {
+                try {
 					const lktp = await uploadFileSingle('inp-ktp', 'KTP', nama);
 					const lstnk = await uploadFileSingle('inp-stnk', 'STNK', nama);
-					const lpjk = await uploadFileSingle('inp-pajak', 'PAJAK', nama);
+                    const lpjk = await uploadFileSingle('inp-pajak', 'PAJAK', nama);
 					const payload = {
 						action: "submitPengajuan",
 						mitra: localStorage.getItem('mitra_name'),
@@ -436,31 +435,31 @@
 						tahun: document.getElementById('inp-tahun').value,
 						cabangSurvey: document.getElementById('inp-cabang-survey').value,
 						detail: document.getElementById('inp-detail').value,
-                        // MENGIRIM DATA KE SHEET KOLOM L
                         plafon: cleanNumber(document.getElementById('inp-plafon-pengajuan').value),
 						fileKtp: lktp, fileStnk: lstnk, filePajak: lpjk
 					};
-					const resp = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
+                    const resp = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
 					const res = await resp.json();
-					if(res.result === "success") { alert("Berhasil Dikirim!"); switchTab('status'); }
-				} catch(e) { alert("Gagal kirim."); } finally { btn.disabled = false; btn.innerText = "KIRIM PENGAJUAN"; }
+                    if(res.result === "success") { alert("Berhasil Dikirim!"); switchTab('status'); }
+				} catch(e) { alert("Gagal kirim."); } finally { btn.disabled = false;
+                btn.innerText = "KIRIM PENGAJUAN"; }
 			}
 
 			function submitToWhatsApp() {
 				const n = document.getElementById('debitur-name').value;
 				const u = document.getElementById('vehicle-model').value;
 				const t = document.getElementById('vehicle-year').value;
-				const tim = localStorage.getItem('mitra_tim');
+                const tim = localStorage.getItem('mitra_tim');
 				const pimpinan = { "Jayapura-MRH1": "6281343269253", "Jayapura-MRH2": "6281247940024" };
 				const wa = pimpinan[tim] || "6281315574375";
-				const msg = `*SIMULASI PENGAJUAN*\nNama: ${n}\nUnit: ${u} ${t}\nPlafon: ${document.getElementById('amount-input').value}\nTenor: ${selectedTenor} Bulan`;
+                const msg = `*SIMULASI PENGAJUAN*\nNama: ${n}\nUnit: ${u} ${t}\nPlafon: ${document.getElementById('amount-input').value}\nTenor: ${selectedTenor} Bulan`;
 				window.open(`https://api.whatsapp.com/send?phone=${wa}&text=${encodeURIComponent(msg)}`);
 			}
 
 			window.onload = () => {
 				lucide.createIcons();
 				updateTenorOptions();
-				const n = localStorage.getItem('mitra_name');
+                const n = localStorage.getItem('mitra_name');
 				if (n) document.getElementById('welcome-text').innerText = `Halo, ${n} - Partner Portal`;
 			};
 		</script>
