@@ -309,13 +309,23 @@
                 } catch (err) { console.error(err); }
 			}
 
+            // PERBAIKAN LOGIKA DURASI (ANTI PERBEDAAN WIT/WIB)
             function calculateDuration(start, end) {
-                const diffMs = Math.abs(new Date(end) - new Date(start));
+                // Konversi semua ke milidetik UTC agar selisihnya murni (tidak terpengaruh zona waktu)
+                const s = new Date(start).getTime();
+                const e = new Date(end).getTime();
+                
+                let diffMs = e - s;
+                
+                // Jika hasil negatif (biasanya karena delay server), set ke minimal 0
+                if (diffMs < 0) diffMs = 0;
+
                 const totalMinutes = Math.floor(diffMs / 60000);
                 const totalHours = Math.floor(totalMinutes / 60);
                 const d = Math.floor(totalHours / 24);
                 const h = totalHours % 24;
                 const m = totalMinutes % 60;
+
                 if (d > 0) return `${d}h ${h}j`;
                 if (h > 0) return `${h}j ${m}m`;
                 return `${m}m`;
@@ -342,6 +352,8 @@
 							const tglUpdate = item.tanggalUpdate;
                             const tglSekarang = new Date();
 							const isFinal = (s === "GOLIVE" || s === "REJECT" || s === "CANCEL");
+                            
+                            // Hitung Durasi Total
                             const slaTotalText = calculateDuration(tglMulai, isFinal ? tglUpdate : tglSekarang);
 
 							const steps = ["PROSES", "SURVEY", "KOMITE", "APPROVE", "GOLIVE"];
