@@ -32,6 +32,11 @@
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
             -webkit-appearance: none; margin: 0;
         }
+        /* Style Stepper */
+        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: #e2e8f0; position: relative; }
+        .step-dot.active { background: #ea580c; box-shadow: 0 0 8px #ea580c; }
+        .step-line { flex: 1; height: 2px; background: #e2e8f0; }
+        .step-line.active { background: #ea580c; }
     </style>
 </head>
 <body class="min-h-screen pb-10">
@@ -41,13 +46,13 @@
             <button onclick="handleLogout()" class="absolute top-8 right-6 p-2 bg-orange-500 hover:bg-orange-700 rounded-xl transition-all shadow-lg border border-orange-400">
                 <i data-lucide="log-out" class="w-4 h-4"></i>
             </button>
-            <h1 class="text-2xl font-extrabold tracking-tight">Smart Finance</h1>
+            <h1 class="text-2xl font-extrabold tracking-tight text-white">Smart Finance</h1>
             <p id="welcome-text" class="text-orange-100/70 text-xs mt-1 font-bold uppercase tracking-widest">Partner Portal</p>
         </header>
 
         <div class="flex border-b border-orange-100 bg-white sticky top-0 z-10">
-            <button onclick="switchTab('simulasi')" id="tab-simulasi" class="tab-btn active flex-1 py-4 font-bold text-[10px] tracking-tight">SIMULASI</button>
-            <button onclick="switchTab('pengajuan')" id="tab-pengajuan" class="tab-btn flex-1 py-4 font-bold text-[10px] tracking-tight text-slate-400">PENGAJUAN</button>
+            <button onclick="switchTab('simulasi')" id="tab-simulasi" class="tab-btn active flex-1 py-4 font-bold text-[10px] tracking-tight uppercase">Simulasi</button>
+            <button onclick="switchTab('pengajuan')" id="tab-pengajuan" class="tab-btn flex-1 py-4 font-bold text-[10px] tracking-tight text-slate-400 uppercase">Pengajuan</button>
             <button onclick="switchTab('status')" id="tab-status" class="tab-btn flex-1 py-4 font-bold text-[10px] tracking-tight text-slate-400 uppercase">Status Aplikasi</button>
         </div>
 
@@ -56,9 +61,7 @@
             <div id="section-simulasi" class="space-y-6">
                 <div class="bg-orange-50 rounded-3xl p-6 border border-orange-100 shadow-sm">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="p-2 bg-orange-600 rounded-lg text-white">
-                            <i data-lucide="calculator" class="w-5 h-5"></i>
-                        </div>
+                        <div class="p-2 bg-orange-600 rounded-lg text-white"><i data-lucide="calculator" class="w-5 h-5"></i></div>
                         <h2 class="font-bold text-orange-900">Simulasi Pinjaman</h2>
                     </div>
                     <div class="space-y-6">
@@ -81,25 +84,25 @@
                     </div>
                 </div>
                 <div class="px-2 py-1 italic text-[10px] text-slate-500">
-                    <span class="font-bold text-orange-600">PENTING:</span> Hitungan ini hanyalah estimasi awal. Klik tombol di bawah untuk pengecekan detail.
+                    <span class="font-bold text-orange-600">PENTING :</span> Hitungan ini hanya simulasi, nilai angsuran dan pencairan bisa lebih tinggi atau lebih rendah berdasarkan hasil survey, data asset, dan data lainnya. Untuk informasi hitungan pasti, Silahkan Klik <span class="font-bold text-slate-800 uppercase">Cek Nilai Pencairan</span>.
                 </div>
-                <button onclick="openLeadModal()" class="w-full bg-orange-600 text-white rounded-2xl py-5 font-bold shadow-xl">CEK NILAI PENCAIRAN</button>
+                <button onclick="switchTab('pengajuan')" class="w-full bg-orange-600 text-white rounded-2xl py-5 font-bold shadow-xl uppercase tracking-wider">Cek Nilai Pencairan</button>
             </div>
 
             <div id="section-pengajuan" class="hidden space-y-4">
                 <div class="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm space-y-5">
                     <div class="flex items-center gap-3">
                         <div class="p-2 bg-orange-600 rounded-lg text-white"><i data-lucide="file-plus" class="w-5 h-5"></i></div>
-                        <h2 class="font-bold text-slate-800">Input Aplikasi Baru</h2>
+                        <h2 class="font-bold text-slate-800 uppercase text-sm tracking-tighter">Input Aplikasi Baru</h2>
                     </div>
                     <div class="space-y-4">
                         <input type="text" id="inp-nama" placeholder="Nama Lengkap KTP" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none font-semibold">
                         <input type="number" id="inp-nik" placeholder="NIK (16 Digit)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none font-semibold">
-                        <input type="number" id="inp-hp" placeholder="WhatsApp (08xx)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none font-semibold">
+                        <input type="number" id="inp-hp" placeholder="Nomor WhatsApp" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none font-semibold">
                         
                         <div>
-                            <label class="text-[9px] font-bold text-orange-600 uppercase ml-1">Nominal Pengajuan</label>
-                            <input type="text" id="inp-plafon" placeholder="Contoh: 15.000.000" oninput="this.value = formatNumber(this.value)" class="w-full p-4 bg-orange-50 border-orange-100 border rounded-2xl outline-none font-bold text-orange-800">
+                            <label class="text-[9px] font-bold text-orange-600 uppercase mb-1 ml-1 block">Nominal Pengajuan (Plafon)</label>
+                            <input type="text" id="inp-plafon" placeholder="Contoh: 10.000.000" oninput="this.value = formatNumber(this.value)" class="w-full p-4 bg-orange-50 border border-orange-100 rounded-2xl font-bold text-orange-800 outline-none">
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
@@ -119,23 +122,23 @@
                         
                         <div class="relative w-full h-16 bg-orange-50 border-2 border-dashed border-orange-200 rounded-2xl flex flex-col items-center justify-center text-orange-400">
                             <i data-lucide="camera" class="w-5 h-5 mb-1"></i>
-                            <span id="label-ktp" class="text-[8px] font-bold">UPLOAD KTP</span>
+                            <span id="label-ktp" class="text-[8px] font-bold uppercase tracking-widest">Upload KTP</span>
                             <input type="file" id="inp-ktp" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div class="relative w-full h-20 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400">
-                                <i data-lucide="camera" class="w-5 h-5 mb-1"></i>
-                                <span id="label-stnk" class="text-[8px] font-bold uppercase">STNK</span>
+                            <div class="relative w-full h-24 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400">
+                                <i data-lucide="camera" class="w-6 h-6 mb-1"></i>
+                                <span id="label-stnk" class="text-[8px] font-bold uppercase tracking-widest">Upload STNK</span>
                                 <input type="file" id="inp-stnk" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
                             </div>
-                            <div class="relative w-full h-20 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400">
-                                <i data-lucide="camera" class="w-5 h-5 mb-1"></i>
-                                <span id="label-pajak" class="text-[8px] font-bold uppercase">PAJAK</span>
+                            <div class="relative w-full h-24 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400">
+                                <i data-lucide="camera" class="w-6 h-6 mb-1"></i>
+                                <span id="label-pajak" class="text-[8px] font-bold uppercase tracking-widest">Upload Pajak</span>
                                 <input type="file" id="inp-pajak" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
                             </div>
                         </div>
                     </div>
-                    <button id="btn-submit-pengajuan" onclick="submitAplikasiBaru()" class="w-full bg-slate-900 text-white rounded-2xl py-4 font-bold">KIRIM PENGAJUAN</button>
+                    <button id="btn-submit-pengajuan" onclick="submitAplikasiBaru()" class="w-full bg-slate-900 text-white rounded-2xl py-4 font-bold uppercase tracking-widest">Kirim Pengajuan</button>
                 </div>
             </div>
 
@@ -168,20 +171,19 @@
                     </div>
                 </div>
 
-                <div id="status-list-container" class="space-y-4">
-                    <p class="text-center text-xs text-slate-400 py-10">Memuat data...</p>
+                <div id="status-list-container" class="space-y-4 pb-10">
+                    <p class="text-center text-xs text-slate-400 py-10">Memuat Data...</p>
                 </div>
             </div>
-
         </main>
     </div>
 
     <div id="admin-update-modal" class="modal-overlay">
         <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl">
-            <h3 class="text-xl font-extrabold text-slate-800 mb-6">Update Status</h3>
+            <h3 class="text-xl font-extrabold text-slate-800 mb-6 uppercase tracking-tighter">Update Status</h3>
             <div class="space-y-4">
                 <input type="hidden" id="update-id-hidden">
-                <select id="update-status-select" class="w-full p-4 bg-slate-50 border rounded-xl outline-none font-semibold">
+                <select id="update-status-select" class="w-full p-4 bg-slate-50 border rounded-xl outline-none font-bold uppercase">
                     <option value="PROSES">PROSES</option>
                     <option value="SURVEY">SURVEY</option>
                     <option value="KOMITE">KOMITE</option>
@@ -191,10 +193,10 @@
                     <option value="REJECT">REJECT</option>
                     <option value="CANCEL">CANCEL</option>
                 </select>
-                <textarea id="update-keterangan-text" placeholder="Catatan Admin..." class="w-full p-4 bg-slate-50 border rounded-xl outline-none"></textarea>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="closeAdminModal()" class="bg-slate-200 py-4 rounded-2xl font-bold">BATAL</button>
-                    <button id="btn-save-status" onclick="saveStatusAdmin()" class="bg-orange-600 text-white py-4 rounded-2xl font-bold shadow-lg">SIMPAN</button>
+                <textarea id="update-keterangan-text" placeholder="Catatan Admin..." class="w-full p-4 bg-slate-50 border rounded-xl outline-none font-semibold"></textarea>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="closeAdminModal()" class="bg-slate-100 py-4 rounded-2xl font-bold uppercase text-[10px]">Batal</button>
+                    <button id="btn-save-status" onclick="saveStatusAdmin()" class="bg-orange-600 text-white py-4 rounded-2xl font-bold shadow-lg uppercase text-[10px]">Simpan</button>
                 </div>
             </div>
         </div>
@@ -203,6 +205,10 @@
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwNAb9m2rPUR8kX7RCXbFFVvCvvHq9Orb1HGsPVrbSR-TJfu6kCR8IWD-0RADi75fSy/exec";
         let selectedTenor = 12;
+
+        document.getElementById('inp-ktp').onchange = e => document.getElementById('label-ktp').innerText = e.target.files[0].name.substring(0,15);
+        document.getElementById('inp-stnk').onchange = e => document.getElementById('label-stnk').innerText = e.target.files[0].name.substring(0,10);
+        document.getElementById('inp-pajak').onchange = e => document.getElementById('label-pajak').innerText = e.target.files[0].name.substring(0,10);
 
         function formatNumber(n) { return n.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
         function cleanNumber(s) { return parseInt(s.toString().replace(/\./g, "")) || 0; }
@@ -234,34 +240,51 @@
                     if(s === "REJECT") countReject++;
                     if(s === "CANCEL") countLoss++;
 
-                    // SLA Logic Fix
-                    const tglUpdate = new Date(item.tanggalUpdate || item.tanggalInput);
-                    const sekarang = new Date();
-                    const diffMs = Math.max(0, sekarang - tglUpdate);
-                    const mTotal = Math.floor(diffMs / 60000);
-                    const h = Math.floor(mTotal / 60);
-                    const m = mTotal % 60;
-                    const d = Math.floor(h / 24);
-                    let slaText = d > 0 ? `${d}H ${h%24}J` : (h > 0 ? `${h}J ${m}M` : `${m}M`);
+                    // SLA
+                    const tglRef = new Date(item.tanggalUpdate || item.tanggalInput);
+                    const skrg = new Date();
+                    const diff = Math.max(0, skrg - tglRef);
+                    const minTotal = Math.floor(diff / 60000);
+                    const hr = Math.floor(minTotal / 60);
+                    const mn = minTotal % 60;
+                    const dy = Math.floor(hr / 24);
+                    let slaStr = dy > 0 ? `${dy}H ${hr%24}J` : (hr > 0 ? `${hr}J ${mn}M` : `${mn}M`);
+
+                    // STEPPER LOGIC
+                    const steps = ["PROSES", "SURVEY", "KOMITE", "APPROVE", "GOLIVE"];
+                    const currentIdx = steps.indexOf(s);
+                    let stepperHtml = '<div class="flex items-center w-full mt-2 mb-4">';
+                    steps.forEach((st, idx) => {
+                        const isActive = idx <= currentIdx;
+                        stepperHtml += `<div class="step-dot ${isActive ? 'active' : ''}"></div>`;
+                        if(idx < steps.length - 1) {
+                            stepperHtml += `<div class="step-line ${idx < currentIdx ? 'active' : ''}"></div>`;
+                        }
+                    });
+                    stepperHtml += '</div>';
 
                     listHtml += `
-                    <div class="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm space-y-4">
+                    <div class="bg-white border border-slate-100 rounded-[2rem] p-6 shadow-sm space-y-3">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-bold text-slate-900">${item.nama}</h4>
-                                <p class="text-[10px] text-orange-600 font-bold uppercase">Plafon: Rp ${formatNumber(item.plafon || "0")}</p>
+                                <h4 class="font-bold text-slate-900 text-sm">${item.nama}</h4>
+                                <p class="text-[10px] text-orange-600 font-bold uppercase tracking-tighter">Plafon: Rp ${formatNumber(item.plafon || "0")}</p>
                             </div>
-                            <span class="bg-orange-50 text-orange-600 text-[9px] font-black px-3 py-1 rounded-full uppercase">${s}</span>
+                            <span class="bg-orange-50 text-orange-600 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">${s}</span>
                         </div>
-                        <div class="bg-slate-50 p-3 rounded-2xl">
-                            <p class="text-[10px] text-slate-500 italic">Ket: ${item.keterangan || '-'}</p>
+                        
+                        ${s !== "REJECT" && s !== "CANCEL" && s !== "REVISI" ? stepperHtml : ''}
+
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                            <p class="text-[10px] text-slate-500 italic leading-relaxed">Ket: ${item.keterangan || '-'}</p>
                         </div>
-                        <div class="flex justify-between items-center pt-2 border-t border-slate-50">
+
+                        <div class="flex justify-between items-center pt-2">
                             <div class="flex items-center gap-1 text-slate-400">
                                 <i data-lucide="clock" class="w-3 h-3"></i>
-                                <span class="text-[9px] font-bold uppercase">${slaText}</span>
+                                <span class="text-[9px] font-bold uppercase tracking-widest">${slaStr}</span>
                             </div>
-                            ${isPimpinan ? `<button onclick="openAdminModal('${item.id}', '${s}')" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-[9px] font-bold">UPDATE</button>` : ''}
+                            ${isPimpinan ? `<button onclick="openAdminModal('${item.id}', '${s}')" class="bg-slate-900 text-white px-5 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest">Update</button>` : ''}
                         </div>
                     </div>`;
                 });
@@ -270,9 +293,9 @@
                 document.getElementById('sum-reject').innerText = countReject;
                 document.getElementById('sum-loss').innerText = countLoss;
                 document.getElementById('total-bonus-cair').innerText = "Rp " + formatNumber(totalBonus);
-                document.getElementById('sum-total').innerText = `${data.length} Pengajuan`;
-                container.innerHTML = listHtml || `<p class="text-center text-xs text-slate-400 py-10">Belum ada data.</p>`;
-            } catch (e) { container.innerHTML = "Gagal memuat."; }
+                document.getElementById('sum-total').innerText = `${data.length} Aplikasi`;
+                container.innerHTML = listHtml || `<p class="text-center text-xs text-slate-400 py-10">Belum Ada Pengajuan</p>`;
+            } catch (e) { container.innerHTML = "Error Koneksi."; }
             lucide.createIcons();
         }
 
@@ -287,19 +310,19 @@
 
         async function submitAplikasiBaru() {
             const btn = document.getElementById('btn-submit-pengajuan');
-            const nama = document.getElementById('inp-nama').value;
-            if(!nama) return alert("Nama wajib diisi!");
+            const nm = document.getElementById('inp-nama').value;
+            if(!nm) return alert("Isi Nama Nasabah!");
             btn.disabled = true; btn.innerText = "MENGUNGGAH BERKAS...";
             try {
-                const lktp = await uploadFileSingle('inp-ktp', 'KTP', nama);
-                const lstnk = await uploadFileSingle('inp-stnk', 'STNK', nama);
-                const lpjk = await uploadFileSingle('inp-pajak', 'PAJAK', nama);
+                const kt = await uploadFileSingle('inp-ktp', 'KTP', nm);
+                const st = await uploadFileSingle('inp-stnk', 'STNK', nm);
+                const pj = await uploadFileSingle('inp-pajak', 'PAJAK', nm);
                 
-                const payload = {
+                const p = {
                     action: "submitPengajuan",
                     mitra: localStorage.getItem('mitra_name'),
                     tim: localStorage.getItem('mitra_tim'),
-                    nama, 
+                    nama: nm, 
                     hp: document.getElementById('inp-hp').value,
                     nik: document.getElementById('inp-nik').value,
                     plafon: cleanNumber(document.getElementById('inp-plafon').value),
@@ -307,12 +330,12 @@
                     tahun: document.getElementById('inp-tahun').value,
                     cabangSurvey: document.getElementById('inp-cabang-survey').value,
                     detail: document.getElementById('inp-detail').value,
-                    fileKtp: lktp, fileStnk: lstnk, filePajak: lpjk
+                    fileKtp: kt, fileStnk: st, filePajak: pj
                 };
-                const r = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const r = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(p) });
                 const res = await r.json();
-                if(res.result === "success") { alert("Berhasil Terkirim!"); switchTab('status'); }
-            } catch(e) { alert("Terjadi kesalahan."); } finally { btn.disabled = false; btn.innerText = "KIRIM PENGAJUAN"; }
+                if(res.result === "success") { alert("Berhasil!"); switchTab('status'); }
+            } catch(e) { alert("Error."); } finally { btn.disabled = false; btn.innerText = "KIRIM PENGAJUAN"; }
         }
 
         function openAdminModal(id, s) {
@@ -324,40 +347,40 @@
         function closeAdminModal() { document.getElementById('admin-update-modal').classList.remove('active'); }
 
         async function saveStatusAdmin() {
-            const btn = document.getElementById('btn-save-status');
-            btn.innerText = "...";
-            const payload = {
+            const b = document.getElementById('btn-save-status');
+            b.innerText = "...";
+            const p = {
                 action: "updateStatusAdmin",
                 id: document.getElementById('update-id-hidden').value,
                 status: document.getElementById('update-status-select').value,
                 keterangan: document.getElementById('update-keterangan-text').value
             };
             try {
-                await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
+                await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(p) });
                 closeAdminModal(); fetchStatusData();
-            } catch(e) { alert("Gagal."); } finally { btn.innerText = "SIMPAN"; }
+            } catch(e) { alert("Gagal."); } finally { b.innerText = "SIMPAN"; }
         }
 
         function handleAmountChange(input) { input.value = formatNumber(input.value); calculateSimulation(); }
         function updateTenorOptions() {
-            const type = document.getElementById('main-vehicle-type').value;
-            const container = document.getElementById('tenor-container');
-            const tenors = type === "Motor" ? [6, 12, 18, 24] : [12, 24, 36, 48];
-            container.innerHTML = '';
-            tenors.forEach(t => {
+            const v = document.getElementById('main-vehicle-type').value;
+            const c = document.getElementById('tenor-container');
+            const t = v === "Motor" ? [6, 12, 18, 24] : [12, 24, 36, 48];
+            c.innerHTML = '';
+            t.forEach(x => {
                 const btn = document.createElement('button');
-                btn.innerText = t;
-                btn.className = `tenor-btn py-3 rounded-xl border-2 border-orange-100 font-bold ${t === selectedTenor ? 'active' : ''}`;
-                btn.onclick = () => { selectedTenor = t; updateTenorOptions(); calculateSimulation(); };
-                container.appendChild(btn);
+                btn.innerText = x;
+                btn.className = `tenor-btn py-3 rounded-xl border-2 border-orange-100 font-bold ${x === selectedTenor ? 'active' : ''}`;
+                btn.onclick = () => { selectedTenor = x; updateTenorOptions(); calculateSimulation(); };
+                c.appendChild(btn);
             });
             calculateSimulation();
         }
         function calculateSimulation() {
-            const amount = cleanNumber(document.getElementById('amount-input').value);
-            const rate = document.getElementById('main-vehicle-type').value === "Mobil" ? 0.009 : 0.015;
-            const monthly = Math.round((amount + (amount * rate * selectedTenor)) / selectedTenor);
-            document.getElementById('monthly-installment').innerText = "Rp " + formatNumber(monthly.toString());
+            const a = cleanNumber(document.getElementById('amount-input').value);
+            const r = document.getElementById('main-vehicle-type').value === "Mobil" ? 0.009 : 0.015;
+            const m = Math.round((a + (a * r * selectedTenor)) / selectedTenor);
+            document.getElementById('monthly-installment').innerText = "Rp " + formatNumber(m.toString());
         }
 
         window.onload = () => { 
