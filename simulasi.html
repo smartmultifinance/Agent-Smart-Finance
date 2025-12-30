@@ -33,9 +33,27 @@
 			input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 				-webkit-appearance: none; margin: 0;
             }
-            /* Custom SweetAlert Style agar senada dengan orange */
-            .swal2-popup { border-radius: 2rem !important; font-family: 'Plus Jakarta Sans', sans-serif !important; }
-            .swal2-styled.swal2-confirm { background-color: #ea580c !important; border-radius: 1rem !important; }
+
+            /* SweetAlert Modern Custom Design */
+            .swal2-popup { 
+                border-radius: 2.5rem !important; 
+                padding: 2rem !important;
+                font-family: 'Plus Jakarta Sans', sans-serif !important;
+                box-shadow: 0 25px 50px -12px rgba(234, 88, 12, 0.2) !important;
+            }
+            .swal2-title { font-weight: 800 !important; color: #1e293b !important; font-size: 1.5rem !important; }
+            .swal2-styled.swal2-confirm { 
+                background-color: #ea580c !important; 
+                border-radius: 1.2rem !important; 
+                padding: 0.8rem 2.5rem !important;
+                font-weight: 700 !important;
+                box-shadow: 0 10px 15px -3px rgba(234, 88, 12, 0.3) !important;
+            }
+            .swal2-styled.swal2-cancel { 
+                border-radius: 1.2rem !important; 
+                padding: 0.8rem 2.5rem !important;
+                font-weight: 700 !important;
+            }
 		</style>
 	</head>
 	<body class="min-h-screen pb-10">
@@ -238,21 +256,20 @@
 			document.getElementById('inp-stnk').onchange = e => document.getElementById('label-stnk').innerText = e.target.files[0].name.substring(0,12);
             document.getElementById('inp-pajak').onchange = e => document.getElementById('label-pajak').innerText = e.target.files[0].name.substring(0,12);
 
-            // FIX POPUP LOGOUT MODERN
 			function confirmLogout() {
                 Swal.fire({
                     title: 'Logout Sekarang?',
-                    text: "Sesi Anda akan diakhiri dan harus login kembali.",
+                    text: "Sesi Anda akan dihapus demi keamanan.",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Ya, Keluar',
-                    cancelButtonText: 'Tidak',
+                    confirmButtonText: 'Ya, Logout',
+                    cancelButtonText: 'Batal',
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
                         localStorage.clear();
                         sessionStorage.clear();
-                        window.location.href = "index.html";
+                        window.location.href = "index.html"; 
                     }
                 });
 			}
@@ -294,6 +311,19 @@
                 } catch (err) { console.error(err); }
 			}
 
+            // FUNGSI HELPER HITUNG DURASI
+            function calculateDuration(start, end) {
+                const diffMs = Math.abs(new Date(end) - new Date(start));
+                const totalMinutes = Math.floor(diffMs / 60000);
+                const totalHours = Math.floor(totalMinutes / 60);
+                const d = Math.floor(totalHours / 24);
+                const h = totalHours % 24;
+                const m = totalMinutes % 60;
+                if (d > 0) return `${d}h ${h}j`;
+                if (h > 0) return `${h}j ${m}m`;
+                return `${m}m`;
+            }
+
 			async function fetchStatusData() {
 				const container = document.getElementById('status-list-container');
 				const tim = localStorage.getItem('mitra_tim');
@@ -311,17 +341,13 @@
 							const bonusVal = parseInt(item.bonus) || 0;
 							if(s === "GOLIVE") totalBonusGolive += bonusVal;
 
-							const tglMulai = new Date(item.tanggalInput);
-							const tglAkhir = (s === "GOLIVE" || s === "REJECT" || s === "CANCEL") ? new Date(item.tanggalUpdate) : new Date();
-							const diffMs = Math.abs(tglAkhir - tglMulai);
-							
-							const totalMinutes = Math.floor(diffMs / 60000);
-							const totalHours = Math.floor(totalMinutes / 60);
-							const d = Math.floor(totalHours / 24);
-							const h = totalHours % 24;
-							const m = totalMinutes % 60;
-
-							let slaText = d > 0 ? `${d} Hari, ${h} Jam` : (h > 0 ? `${h} Jam, ${m} Menit` : `${m} Menit`);
+                            // WAKTU TOTAL
+							const tglMulai = item.tanggalInput;
+							const tglUpdate = item.tanggalUpdate;
+                            const tglSekarang = new Date();
+							const isFinal = (s === "GOLIVE" || s === "REJECT" || s === "CANCEL");
+                            
+                            const slaTotalText = calculateDuration(tglMulai, isFinal ? tglUpdate : tglSekarang);
 
 							const steps = ["PROSES", "SURVEY", "KOMITE", "APPROVE", "GOLIVE"];
 							const isFailed = (s === "REJECT" || s === "CANCEL");
@@ -335,15 +361,24 @@
 								
 								stepperHtml += `
 									<div class="flex flex-col items-center flex-1 relative">
-										<div class="absolute -top-4 text-[6px] font-bold text-orange-600 whitespace-nowrap italic tracking-tighter">
-											${isActiveStep && !isFailed && s !== "GOLIVE" ? slaText : ""}
-										</div>
 										<div class="w-4 h-4 rounded-full z-10 flex items-center justify-center text-[7px] font-bold 
 											${isDone ? 'bg-orange-600 text-white' : (isFailPoint ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-400')}">
 											${isFailPoint ? 'X' : idx + 1}
 										</div>
 										<span class="text-[6px] mt-1 font-bold ${isDone ? 'text-orange-600' : 'text-slate-400'}">${stepName}</span>
-										${idx < 4 ? `<div class="absolute w-full h-[1.5px] left-1/2 top-2 -z-0 ${idx < currentStepIdx && !isFailed ? 'bg-orange-600' : 'bg-slate-200'}"></div>` : ''}
+										
+                                        ${idx < 4 ? `
+                                            <div class="absolute w-full h-[1.5px] left-1/2 top-2 -z-0 ${idx < currentStepIdx && !isFailed ? 'bg-orange-600' : 'bg-slate-200'}">
+                                                ${idx < currentStepIdx && !isFailed ? `
+                                                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 text-[5px] font-black text-orange-600 bg-white px-1.5 border border-orange-100 rounded-full shadow-sm">
+                                                        ${calculateDuration(tglMulai, tglUpdate)}
+                                                    </span>
+                                                ` : (isActiveStep && !isFinal ? `
+                                                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 text-[5px] font-black text-slate-400 bg-white px-1.5 border border-slate-100 rounded-full italic animate-pulse">
+                                                        PROSES...
+                                                    </span>
+                                                ` : '')}
+                                            </div>` : ''}
 									</div>`;
 							});
 							stepperHtml += `</div>`;
@@ -355,7 +390,7 @@
 								<div class="flex justify-between items-start border-b border-slate-50 pb-2">
 									<div>
 										<h4 class="font-bold text-slate-900 text-sm">${item.nama}</h4>
-                                        <p class="text-[10px] text-orange-600 font-bold uppercase tracking-tight">Plafon Pengajuan: Rp ${formatNumber((item.plafon || "0").toString())}</p>
+                                        <p class="text-[10px] text-orange-600 font-bold uppercase tracking-tight">Plafon: Rp ${formatNumber((item.plafon || "0").toString())}</p>
 										<p class="text-[10px] text-slate-400 font-medium">${item.unit}</p>
 									</div>
 									<span class="${sColor} text-[10px] font-bold px-2 py-1 rounded-full uppercase">${s}</span>
@@ -364,8 +399,8 @@
 								<div class="flex justify-between items-end text-[9px]">
 									<div class="flex-1">
 										<p class="text-slate-500 italic">Ket: ${item.keterangan || '-'}</p>
-										<p class="text-[8px] text-slate-400 font-bold mt-1 uppercase tracking-tighter">
-                                            ${(s === "GOLIVE" || isFailed) ? 'Total Waktu Proses: ' + slaText : 'Durasi Tahap: ' + slaText}
+										<p class="text-[8px] text-orange-400 font-bold mt-1 uppercase tracking-tighter">
+                                            ${isFinal ? 'Total Waktu Proses: ' + slaTotalText : 'Waktu Berjalan: ' + slaTotalText}
                                         </p>
 									</div>
 									<div class="text-right">
@@ -437,7 +472,6 @@
 				return json.url || "-";
 			}
 
-            // FIX NOTIFIKASI MODERN SETELAH KIRIM DATA
 			async function submitAplikasiBaru() {
 				const btn = document.getElementById('btn-submit-pengajuan');
 				const nama = document.getElementById('inp-nama').value;
@@ -497,7 +531,12 @@
 				lucide.createIcons();
 				updateTenorOptions();
                 const n = localStorage.getItem('mitra_name');
-				if (n) document.getElementById('welcome-text').innerText = `Halo, ${n} - Partner Portal`;
+				if (n) {
+                    document.getElementById('welcome-text').innerText = `Halo, ${n} - Partner Portal`;
+                    // BERSIHKAN SEMUA DATA NOTIFIKASI SISA LOGIN/REGISTRASI
+                    localStorage.removeItem('pendaftaran_sukses');
+                    sessionStorage.removeItem('reg_status');
+                }
 			};
 		</script>
 	</body>
