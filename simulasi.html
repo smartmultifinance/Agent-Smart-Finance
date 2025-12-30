@@ -321,23 +321,6 @@
                 return `${m}m`;
             }
 
-            // FUNGSI KHUSUS HITUNG PER STEP (START FROM 0)
-            function getStepDurationDisplay(start, update, currentIdx) {
-                const totalMs = Math.abs(new Date(update) - new Date(start));
-                // Simulasi durasi per tahapan (Bobot estimasi)
-                const weights = [0.15, 0.40, 0.25, 0.20]; 
-                const ms = totalMs * (weights[currentIdx] || 0.1);
-                
-                const mins = Math.floor(ms / 60000);
-                const hh = Math.floor(mins / 60);
-                const mm = mins % 60;
-                const dd = Math.floor(hh / 24);
-
-                if (dd > 0) return `${dd}h ${hh % 24}j`;
-                if (hh > 0) return `${hh}j ${mm}m`;
-                return `${mm}m`;
-            }
-
 			async function fetchStatusData() {
 				const container = document.getElementById('status-list-container');
 				const tim = localStorage.getItem('mitra_tim');
@@ -359,7 +342,6 @@
 							const tglUpdate = item.tanggalUpdate;
                             const tglSekarang = new Date();
 							const isFinal = (s === "GOLIVE" || s === "REJECT" || s === "CANCEL");
-                            
                             const slaTotalText = calculateDuration(tglMulai, isFinal ? tglUpdate : tglSekarang);
 
 							const steps = ["PROSES", "SURVEY", "KOMITE", "APPROVE", "GOLIVE"];
@@ -381,11 +363,15 @@
 										
                                         ${idx < 4 ? `
                                             <div class="absolute w-full h-[1.5px] left-1/2 top-2 -z-0 ${idx < currentStepIdx && !isFailed ? 'bg-orange-600' : 'bg-slate-200'}">
-                                                ${idx < currentStepIdx && !isFailed ? `
+                                                ${idx === 0 && currentStepIdx >= 0 ? `
                                                     <span class="absolute -top-3 left-1/2 -translate-x-1/2 text-[5px] font-black text-orange-600 bg-white px-1.5 border border-orange-100 rounded-full shadow-sm">
-                                                        ${getStepDurationDisplay(tglMulai, tglUpdate, idx)}
+                                                        ${calculateDuration(tglMulai, currentStepIdx > 0 ? tglUpdate : tglSekarang)}
                                                     </span>
-                                                ` : ''}
+                                                ` : (idx <= currentStepIdx && !isFailed && idx > 0 ? `
+                                                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 text-[5px] font-black text-orange-600 bg-white px-1.5 border border-orange-100 rounded-full shadow-sm">
+                                                        -
+                                                    </span>
+                                                ` : '')}
                                             </div>` : ''}
 									</div>`;
 							});
@@ -408,7 +394,7 @@
 									<div class="flex-1">
 										<p class="text-slate-500 italic">Ket: ${item.keterangan || '-'}</p>
 										<p class="text-[8px] text-orange-400 font-bold mt-1 uppercase tracking-tighter">
-                                            ${isFinal ? 'Total Akumulasi Waktu: ' + slaTotalText : 'Waktu Berjalan: ' + slaTotalText}
+                                            ${isFinal ? 'Total Waktu Proses: ' + slaTotalText : 'Waktu Berjalan: ' + slaTotalText}
                                         </p>
 									</div>
 									<div class="text-right">
@@ -541,7 +527,6 @@
                 const n = localStorage.getItem('mitra_name');
 				if (n) {
                     document.getElementById('welcome-text').innerText = `Halo, ${n} - Partner Portal`;
-                    // CLEANUP NOTIF REGISTRASI SESUAI INSTRUKSI
                     localStorage.removeItem('pendaftaran_sukses');
                     sessionStorage.clear(); 
                 }
